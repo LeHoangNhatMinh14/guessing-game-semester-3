@@ -10,4 +10,5 @@ public class IndividualtrackApplication {
         SpringApplication.run(IndividualtrackApplication.class, args);
     }
 
+
 }
