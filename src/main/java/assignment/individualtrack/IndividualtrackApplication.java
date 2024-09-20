@@ -9,6 +9,4 @@ public class IndividualtrackApplication {
     public static void main(String[] args) {
         SpringApplication.run(IndividualtrackApplication.class, args);
     }
-
-
 }
