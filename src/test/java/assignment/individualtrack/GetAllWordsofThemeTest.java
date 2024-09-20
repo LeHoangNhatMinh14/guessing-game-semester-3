@@ -1,5 +1,6 @@
-package assignment.individualtrack.business.impl;
+package assignment.individualtrack;
 
+import assignment.individualtrack.business.impl.GetAllWordsofThemeUseCaseImpl;
 import assignment.individualtrack.domain.GetAllWordsofThemeRequest;
 import assignment.individualtrack.domain.GetAllWordsofThemesResponse;
 import assignment.individualtrack.persistence.ThemeRepo;
