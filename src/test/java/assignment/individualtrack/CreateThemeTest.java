@@ -1,6 +1,5 @@
 package assignment.individualtrack;
 
-import assignment.individualtrack.business.CreateThemeUseCase;
 import assignment.individualtrack.business.impl.CreateThemeUseCaseImpl;
 import assignment.individualtrack.domain.CreateThemeRequest;
 import assignment.individualtrack.domain.CreateThemeResponse;
@@ -25,12 +24,15 @@ class CreateThemeUseCaseTest {
     private ThemeRepo themeRepo;
 
     @InjectMocks
-    private CreateThemeUseCase createThemeUseCase; // Use the interface
+    private CreateThemeUseCaseImpl createThemeUseCase; // Use the interface
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
-        createThemeUseCase = new CreateThemeUseCaseImpl(themeRepo); // Inject the implementation
+        try (var ignored = MockitoAnnotations.openMocks(this)) {
+            createThemeUseCase = new CreateThemeUseCaseImpl(themeRepo);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Test
