@@ -28,11 +28,7 @@ class CreateThemeUseCaseTest {
 
     @BeforeEach
     void setUp() {
-        try (var ignored = MockitoAnnotations.openMocks(this)) {
-            createThemeUseCase = new CreateThemeUseCaseImpl(themeRepo);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
