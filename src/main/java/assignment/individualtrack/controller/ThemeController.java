@@ -1,16 +1,15 @@
 package assignment.individualtrack.controller;
 
-import assignment.individualtrack.business.AddWordToThemeUseCase;
-import assignment.individualtrack.business.CreateGameUseCase;
-import assignment.individualtrack.business.CreateThemeUseCase;
-import assignment.individualtrack.business.GetAllWordsofThemUseCase;
-import assignment.individualtrack.domain.*;
-import assignment.individualtrack.persistence.entity.ThemeEntity;
+import assignment.individualtrack.business.intefaces.AddWordToThemeUseCase;
+import assignment.individualtrack.business.intefaces.CreateThemeUseCase;
+import assignment.individualtrack.business.intefaces.GetAllWordsofThemUseCase;
+import assignment.individualtrack.domain.Themes.AddWordToThemeRequest;
+import assignment.individualtrack.domain.Themes.CreateThemeRequest;
+import assignment.individualtrack.domain.Themes.GetAllWordsofThemeRequest;
+import assignment.individualtrack.domain.Themes.GetAllWordsofThemesResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @RestController
 @RequestMapping("/themes")

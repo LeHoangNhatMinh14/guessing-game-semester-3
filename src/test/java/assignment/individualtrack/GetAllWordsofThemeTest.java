@@ -1,8 +1,8 @@
 package assignment.individualtrack;
 
-import assignment.individualtrack.business.impl.GetAllWordsofThemeUseCaseImpl;
-import assignment.individualtrack.domain.GetAllWordsofThemeRequest;
-import assignment.individualtrack.domain.GetAllWordsofThemesResponse;
+import assignment.individualtrack.business.impl.themes.GetAllWordsofThemeUseCaseImpl;
+import assignment.individualtrack.domain.Themes.GetAllWordsofThemeRequest;
+import assignment.individualtrack.domain.Themes.GetAllWordsofThemesResponse;
 import assignment.individualtrack.persistence.ThemeRepo;
 import assignment.individualtrack.persistence.entity.ThemeEntity;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,7 +11,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 

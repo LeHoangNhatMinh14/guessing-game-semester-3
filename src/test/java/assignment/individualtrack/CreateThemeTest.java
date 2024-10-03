@@ -1,8 +1,8 @@
 package assignment.individualtrack;
 
-import assignment.individualtrack.business.impl.CreateThemeUseCaseImpl;
-import assignment.individualtrack.domain.CreateThemeRequest;
-import assignment.individualtrack.domain.CreateThemeResponse;
+import assignment.individualtrack.business.impl.themes.CreateThemeUseCaseImpl;
+import assignment.individualtrack.domain.Themes.CreateThemeRequest;
+import assignment.individualtrack.domain.Themes.CreateThemeResponse;
 import assignment.individualtrack.persistence.ThemeRepo;
 import assignment.individualtrack.persistence.entity.ThemeEntity;
 import org.junit.jupiter.api.BeforeEach;
