@@ -5,10 +5,10 @@ import lombok.Data;
 
 @Data
 @Builder
-public class EndGameRequest {
-    private int gameId;
+public class GetGameResponse {
+    private long id;
     private int score;
     private int time;
-    private int correctGuesses;
-    private int incorrectGuesses;
+    private long playerId;
+    private GameStatus status;
 }

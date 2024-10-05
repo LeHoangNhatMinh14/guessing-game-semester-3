@@ -5,8 +5,10 @@ import assignment.individualtrack.persistence.GameRepo;
 import assignment.individualtrack.persistence.entity.GameEntity;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Repository
 public class FakeGameRepo implements GameRepo {
@@ -27,5 +29,15 @@ public FakeGameRepo() { this.games = new ArrayList<GameEntity>(); }
         NEXT_ID++;
         this.games.add(game);
         return game;
+    }
+
+    @Override
+    public List<GameEntity> findTop20ByPlayerIdOrderByIdDesc(long playerId) {
+        // Filter games by playerId, sort by id in descending order, and limit to 20 results
+        return this.games.stream()
+                .filter(game -> game.getPlayerId() == playerId) // Filter by playerId
+                .sorted(Comparator.comparingLong(GameEntity::getId).reversed()) // Sort by id descending
+                .limit(20) // Limit to top 20
+                .collect(Collectors.toList());
     }
 }

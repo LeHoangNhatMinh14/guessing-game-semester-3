@@ -1,7 +1,8 @@
 package assignment.individualtrack.business.intefaces;
 
 import assignment.individualtrack.domain.Game.EndGameRequest;
+import assignment.individualtrack.domain.Game.EndGameResponse;
 
 public interface EndGameUseCase {
-    void endGame(EndGameRequest endGameRequest);
+    EndGameResponse endGame(EndGameRequest endGameRequest);
 }

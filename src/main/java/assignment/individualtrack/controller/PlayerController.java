@@ -3,9 +3,8 @@ package assignment.individualtrack.controller;
 import assignment.individualtrack.business.intefaces.CreatePlayerUseCase;
 import assignment.individualtrack.business.intefaces.DeletePlayerUseCase;
 import assignment.individualtrack.business.intefaces.EditPlayerUseCase;
-import assignment.individualtrack.domain.Player.CreatePlayerRequest;
-import assignment.individualtrack.domain.Player.CreatePlayerResponse;
-import assignment.individualtrack.domain.Player.EditPlayerRequest;
+import assignment.individualtrack.business.intefaces.GetPlayerUseCase;
+import assignment.individualtrack.domain.Player.*;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +17,7 @@ public class PlayerController {
     private final CreatePlayerUseCase createPlayerUseCase;
     private final EditPlayerUseCase editPlayerUseCase;
     private final DeletePlayerUseCase deletePlayerUseCase;
+    private final GetPlayerUseCase getPlayerUseCase;
 
     @PostMapping()
     public ResponseEntity<CreatePlayerResponse> registerPlayer(@RequestBody CreatePlayerRequest request) {
@@ -38,5 +38,10 @@ public class PlayerController {
         return ResponseEntity.noContent().build();
     }
 
-
+    @GetMapping("/{id}")
+    public ResponseEntity<GetPlayerResponse> getPlayer(@PathVariable long id) {
+        GetPlayerRequest request = GetPlayerRequest.builder().playerId(id).build();
+        GetPlayerResponse response = getPlayerUseCase.getPlayer(request);
+        return ResponseEntity.ok(response);
+    }
 }

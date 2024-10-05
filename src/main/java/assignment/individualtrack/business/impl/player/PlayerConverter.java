@@ -3,7 +3,7 @@ package assignment.individualtrack.business.impl.player;
 import assignment.individualtrack.domain.Player.Player;
 import assignment.individualtrack.persistence.entity.PlayerEntity;
 
-public class PlayerConverter {
+final class PlayerConverter {
     private PlayerConverter() {
     }
         public static Player convertToDomain(PlayerEntity playerEntity) {
