@@ -2,38 +2,45 @@ package assignment.individualtrack.controller;
 
 import assignment.individualtrack.business.intefaces.AddWordToThemeUseCase;
 import assignment.individualtrack.business.intefaces.CreateThemeUseCase;
+import assignment.individualtrack.business.intefaces.GetAllThemeUseCase;
 import assignment.individualtrack.business.intefaces.GetAllWordsofThemUseCase;
-import assignment.individualtrack.domain.Themes.AddWordToThemeRequest;
-import assignment.individualtrack.domain.Themes.CreateThemeRequest;
-import assignment.individualtrack.domain.Themes.GetAllWordsofThemeRequest;
-import assignment.individualtrack.domain.Themes.GetAllWordsofThemesResponse;
+import assignment.individualtrack.domain.Themes.*;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/themes")
 @AllArgsConstructor
+@CrossOrigin(origins = "http://localhost:5173")
 public class ThemeController {
 
     private final AddWordToThemeUseCase addWordToThemeUseCase;
     private final CreateThemeUseCase addThemeUseCase;
     private final GetAllWordsofThemUseCase getAllWordsofThemUseCase;
+    private final GetAllThemeUseCase getAllThemesUseCase;
 
-    @PostMapping("/{themeId}/words")
-    public ResponseEntity<String> addWordToTheme(@PathVariable Long themeId, @RequestBody AddWordToThemeRequest request) {
+    @PostMapping("/words")
+    public ResponseEntity<String> addWordToTheme(@RequestBody AddWordToThemeRequest request) {
+        // Validate that the word is not null or empty
         String word = request.getWord();
-        if (word == null || word.isEmpty()) {
-            return ResponseEntity.badRequest().body("Word cannot be empty");
+        if (word == null || word.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("Word cannot be empty.");
         }
 
-        addWordToThemeUseCase.addwordtoTheme(request);
+        // Check if the theme exists
+        try {
+            addWordToThemeUseCase.addwordtoTheme(request);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
 
-        return ResponseEntity.ok("Word added to theme");
+        return ResponseEntity.ok("Word added to theme.");
     }
 
     @PostMapping
-    public ResponseEntity<String> addTheme(@RequestBody CreateThemeRequest request) {
+    public ResponseEntity<String> createTheme(@RequestBody CreateThemeRequest request) {
         String themeName = request.getThemeName();
         if (themeName == null || themeName.isEmpty()) {
             return ResponseEntity.badRequest().body("Theme name cannot be empty");
@@ -56,4 +63,14 @@ public class ThemeController {
 
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping
+    public ResponseEntity<GetAllThemesResponse> getAllThemes() {
+        GetAllThemesResponse response = getAllThemesUseCase.getAllThemes();
+//        if (response == null || response.getThemes().isEmpty()) {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+//        }
+        return ResponseEntity.ok(response);
+    }
+
 }

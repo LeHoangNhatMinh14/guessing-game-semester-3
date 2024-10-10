@@ -8,6 +8,7 @@ import assignment.individualtrack.persistence.entity.ThemeEntity;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 @Service
@@ -31,14 +32,23 @@ public class AddWordToThemeUseCaseImpl implements AddWordToThemeUseCase {
         );
     }
 
-    private Optional<ThemeEntity> savewordtoTheme (AddWordToThemeRequest request) {
+    private Optional<ThemeEntity> savewordtoTheme(AddWordToThemeRequest request) {
         Optional<ThemeEntity> themeOptional = themeRepo.findbyID(request.getThemeId());
-        if (themeOptional.isPresent()) {
-            ThemeEntity theme = themeOptional.get();
-            theme.getWords().add(request.getWord());
-            themeRepo.save(theme);
-            return Optional.of(theme);
+
+        // Check if theme exists, return an error if it doesn't
+        if (themeOptional.isEmpty()) {
+            throw new RuntimeException("Theme with ID " + request.getThemeId() + " does not exist.");
         }
-        return Optional.empty();
+
+        ThemeEntity theme = themeOptional.get();
+
+        // Initialize words list if it's null
+        if (theme.getWords() == null) {
+            theme.setWords(new ArrayList<>());
+        }
+
+        theme.getWords().add(request.getWord());
+        themeRepo.save(theme);
+        return Optional.of(theme);
     }
 }
