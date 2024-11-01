@@ -33,7 +33,7 @@ test-job1:
 sonarqube-check:
   stage: sonarqube-check
   script:
-    - - ./gradlew sonar -Dsonar.host.url=SONAR_HOST_URL -Dsonar.login=SONAR_TOKEN
+    - ./gradlew sonar -Dsonar.host.url=$env:SONAR_HOST_URL -Dsonar.login=$env:SONAR_TOKEN
   allow_failure: true
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
