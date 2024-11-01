@@ -38,14 +38,14 @@ class CreateThemeUseCaseTest {
                 .themeName("Adventure")
                 .build();
 
-        when(themeRepo.existsbyName(request.getThemeName())).thenReturn(true);
+        when(themeRepo.existsByName(request.getThemeName())).thenReturn(true);
 
         // Act
         CreateThemeResponse response = createThemeUseCase.createTheme(request);
 
         // Assert
         assertNull(response);
-        verify(themeRepo, times(1)).existsbyName(request.getThemeName());
+        verify(themeRepo, times(1)).existsByName(request.getThemeName());
         verify(themeRepo, times(0)).save(any(ThemeEntity.class));
     }
 
@@ -63,7 +63,7 @@ class CreateThemeUseCaseTest {
                 .words(List.of("explore", "journey", "quest"))
                 .build();
 
-        when(themeRepo.existsbyName(request.getThemeName())).thenReturn(false);
+        when(themeRepo.existsByName(request.getThemeName())).thenReturn(false);
         when(themeRepo.save(any(ThemeEntity.class))).thenReturn(savedTheme);
 
         // Act
@@ -71,7 +71,7 @@ class CreateThemeUseCaseTest {
 
         // Assert
         assertEquals(1L, response.getThemeID());
-        verify(themeRepo, times(1)).existsbyName(request.getThemeName());
+        verify(themeRepo, times(1)).existsByName(request.getThemeName());
         verify(themeRepo, times(1)).save(any(ThemeEntity.class));
     }
 }

@@ -12,6 +12,6 @@ public class DeletePlayerUseCaseImpl implements DeletePlayerUseCase {
 
     @Override
     public void deletePlayer(long playerId) {
-        this.playerRepo.deletebyID(playerId);
+        this.playerRepo.deleteById(playerId);
     }
 }

@@ -17,7 +17,7 @@ public class EditPlayerUseCaseImpl implements EditPlayerUseCase {
 
     @Override
     public void editPlayer(EditPlayerRequest player) {
-        Optional<PlayerEntity> playerOptional = playerRepo.findbyID(player.getId());
+        Optional<PlayerEntity> playerOptional = playerRepo.findById(player.getId());
         if (playerOptional.isEmpty()) {
             throw new InvalidPlayerException("STUDENT_ID_INVALID");
         }

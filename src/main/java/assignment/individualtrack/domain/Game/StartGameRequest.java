@@ -6,5 +6,5 @@ import lombok.Data;
 @Data
 @Builder
 public class StartGameRequest {
-    private int playerID;
+    private Long playerID;
 }

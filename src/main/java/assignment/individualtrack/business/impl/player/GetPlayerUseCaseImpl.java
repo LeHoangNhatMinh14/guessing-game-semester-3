@@ -17,7 +17,7 @@ public class GetPlayerUseCaseImpl implements GetPlayerUseCase {
 
     @Override
     public GetPlayerResponse getPlayer(GetPlayerRequest request) {
-        PlayerEntity playerEntity = playerRepo.findbyID(request.getPlayerId())
+        PlayerEntity playerEntity = playerRepo.findById(request.getPlayerId())
                 .orElseThrow(() -> new InvalidPlayerException("Player not found"));
 
         return GetPlayerResponse.builder()

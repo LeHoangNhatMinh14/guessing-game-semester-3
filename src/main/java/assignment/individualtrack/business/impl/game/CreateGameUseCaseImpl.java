@@ -16,7 +16,7 @@ public class CreateGameUseCaseImpl implements CreateGameUseCase {
     public StartGameResponse createGame(StartGameRequest startGameRequest) {
         // Save the new game with initial values (score and time set to 0)
         GameEntity newGame = GameEntity.builder()
-                .playerId(startGameRequest.getPlayerID()) // Only playerID is necessary when starting
+                .id(startGameRequest.getPlayerID()) // Only playerID is necessary when starting
                 .score(0) // Initialize score to 0
                 .time(0)  // Initialize time to 0
                 .build();
@@ -26,7 +26,7 @@ public class CreateGameUseCaseImpl implements CreateGameUseCase {
         // Return the response with gameId and playerId
         return StartGameResponse.builder()
                 .gameId(savedGame.getId())
-                .playerId(savedGame.getPlayerId())
+                .playerId(savedGame.getId())
                 .build();
     }
 }

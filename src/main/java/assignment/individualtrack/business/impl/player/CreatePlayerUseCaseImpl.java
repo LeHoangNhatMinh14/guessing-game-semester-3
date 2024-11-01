@@ -15,7 +15,7 @@ public class CreatePlayerUseCaseImpl implements CreatePlayerUseCase {
 
     @Override
     public CreatePlayerResponse createPlayer(CreatePlayerRequest player) {
-        if (playerRepo.existsbyName(player.getName())) {
+        if (playerRepo.existsByName(player.getName())) {
             return null;
         }
 

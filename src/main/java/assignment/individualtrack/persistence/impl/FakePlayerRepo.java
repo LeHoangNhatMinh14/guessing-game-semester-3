@@ -9,17 +9,15 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public class FakePlayerRepo implements PlayerRepo {
+public class FakePlayerRepo {
 private static long NEXT_ID = 1;
 private final List<PlayerEntity> players = new ArrayList<>();
-    @Override
     public boolean existsbyName(String name) {
         return this.players
                 .stream()
                 .anyMatch(studentEntity -> studentEntity.getName().equals(name));
     }
 
-    @Override
     public PlayerEntity save(PlayerEntity player) {
         if (player.getId() == null) {
             player.setId(NEXT_ID);
@@ -29,12 +27,10 @@ private final List<PlayerEntity> players = new ArrayList<>();
         return player;
     }
 
-    @Override
     public void deletebyID(long id) {
         this.players.removeIf(studentEntity -> studentEntity.getId().equals(id));
     }
 
-    @Override
     public Optional<PlayerEntity> findbyID(Long id) {
         return this.players.stream()
                 .filter(studentEntity -> studentEntity.getId().equals(id))

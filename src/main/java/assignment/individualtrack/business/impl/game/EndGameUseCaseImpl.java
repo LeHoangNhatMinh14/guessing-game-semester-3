@@ -17,7 +17,7 @@ public class EndGameUseCaseImpl implements EndGameUseCase {
 
     @Override
     public EndGameResponse endGame(EndGameRequest endGameRequest) {
-        GameEntity gameEntity = gameRepo.findbyID(endGameRequest.getGameId())
+        GameEntity gameEntity = gameRepo.findById(endGameRequest.getGameId())
                 .orElseThrow(() -> new GameNotFoundException("Game not found"));
 
         if (gameEntity.getStatus() == GameStatus.COMPLETED) {

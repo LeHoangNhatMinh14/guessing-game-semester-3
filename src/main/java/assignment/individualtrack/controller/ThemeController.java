@@ -67,9 +67,9 @@ public class ThemeController {
     @GetMapping
     public ResponseEntity<GetAllThemesResponse> getAllThemes() {
         GetAllThemesResponse response = getAllThemesUseCase.getAllThemes();
-//        if (response == null || response.getThemes().isEmpty()) {
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-//        }
+        if (response == null || response.getThemes().isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
         return ResponseEntity.ok(response);
     }
 

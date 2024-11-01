@@ -33,7 +33,7 @@ public class AddWordToThemeUseCaseImpl implements AddWordToThemeUseCase {
     }
 
     private Optional<ThemeEntity> savewordtoTheme(AddWordToThemeRequest request) {
-        Optional<ThemeEntity> themeOptional = themeRepo.findbyID(request.getThemeId());
+        Optional<ThemeEntity> themeOptional = themeRepo.findById(request.getThemeId());
 
         // Check if theme exists, return an error if it doesn't
         if (themeOptional.isEmpty()) {

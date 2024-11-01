@@ -18,7 +18,7 @@ public class GetAllWordsofThemeUseCaseImpl implements GetAllWordsofThemUseCase {
 
     @Override
     public GetAllWordsofThemesResponse getAllWords(GetAllWordsofThemeRequest request) {
-        Optional<ThemeEntity> themeOptional = themeRepo.findbyID(request.getThemeId());
+        Optional<ThemeEntity> themeOptional = themeRepo.findById(request.getThemeId());
 
         if (themeOptional.isPresent()) {
             ThemeEntity theme = themeOptional.get();

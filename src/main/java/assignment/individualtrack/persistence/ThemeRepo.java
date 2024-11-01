@@ -1,15 +1,14 @@
 package assignment.individualtrack.persistence;
 
-import assignment.individualtrack.persistence.entity.PlayerEntity;
 import assignment.individualtrack.persistence.entity.ThemeEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface ThemeRepo {
-    boolean existsbyName(String name);
-    ThemeEntity save(ThemeEntity player);
-    void deletebyID(long id);
-    Optional<ThemeEntity> findbyID(Long id);
+public interface ThemeRepo extends JpaRepository<ThemeEntity, Integer> {
+    boolean existsByName(String name);
+    Optional<ThemeEntity> findById(Long id);
+    void deleteById(Long id);
     List<ThemeEntity> findAll();
 }

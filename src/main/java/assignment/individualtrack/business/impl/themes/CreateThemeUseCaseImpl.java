@@ -15,7 +15,7 @@ public class CreateThemeUseCaseImpl implements CreateThemeUseCase {
 
     @Override
     public CreateThemeResponse createTheme(CreateThemeRequest themeName) {
-        if (themeRepo.existsbyName(themeName.getThemeName())) {
+        if (themeRepo.existsByName(themeName.getThemeName())) {
             return null;
         }
         ThemeEntity savedTheme = saveNewTheme(themeName);

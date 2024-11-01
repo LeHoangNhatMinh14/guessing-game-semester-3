@@ -35,7 +35,7 @@ class GetAllWordsofThemeUseCaseImplTest {
         Long themeId = 1L;
         ThemeEntity themeEntity = new ThemeEntity();
         themeEntity.setWords(List.of("apple", "banana"));
-        when(themeRepo.findbyID(themeId)).thenReturn(Optional.of(themeEntity));
+        when(themeRepo.findById(themeId)).thenReturn(Optional.of(themeEntity));
 
         GetAllWordsofThemeRequest request = new GetAllWordsofThemeRequest(themeId);
         GetAllWordsofThemesResponse response = getAllWordsofThemeUseCase.getAllWords(request);
@@ -48,7 +48,7 @@ class GetAllWordsofThemeUseCaseImplTest {
     @Test
     void testGetAllWords_ThemeNotFound() {
         Long themeId = 1L;
-        when(themeRepo.findbyID(themeId)).thenReturn(Optional.empty());
+        when(themeRepo.findById(themeId)).thenReturn(Optional.empty());
 
         GetAllWordsofThemeRequest request = new GetAllWordsofThemeRequest(themeId);
         GetAllWordsofThemesResponse response = getAllWordsofThemeUseCase.getAllWords(request);
