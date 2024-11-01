@@ -19,7 +19,6 @@ stages:
 build-job:
   stage: build
   script:
-    - git config --global --add safe.directory "${CI_PROJECT_DIR}"
     - echo "Hello, $GITLAB_USER_LOGIN!"
     - ./gradlew assemble
 
@@ -27,7 +26,6 @@ build-job:
 test-job1:
   stage: test
   script:
-    - git config --global --add safe.directory "${CI_PROJECT_DIR}"
     - echo "This job tests something"
     - ./gradlew test
 
@@ -35,8 +33,7 @@ test-job1:
 sonarqube-check:
   stage: sonarqube-check
   script:
-    - git config --global --add safe.directory "${CI_PROJECT_DIR}"
-    - ./gradlew sonar -Dsonar.host.url=${SONAR_HOST_URL} -Dsonar.login=${SONAR_TOKEN}
+    - ./gradlew sonar
   allow_failure: true
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
@@ -48,7 +45,6 @@ sonarqube-check:
 deploy-prod:
   stage: deploy
   script:
-    - git config --global --add safe.directory "${CI_PROJECT_DIR}"
     - echo "This job deploys something from the $CI_COMMIT_BRANCH branch."
   environment: production
   rules:
