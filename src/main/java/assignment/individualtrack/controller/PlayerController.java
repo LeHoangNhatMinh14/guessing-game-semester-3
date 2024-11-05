@@ -5,6 +5,7 @@ import assignment.individualtrack.business.intefaces.DeletePlayerUseCase;
 import assignment.individualtrack.business.intefaces.EditPlayerUseCase;
 import assignment.individualtrack.business.intefaces.GetPlayerUseCase;
 import assignment.individualtrack.domain.Player.*;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,8 @@ public class PlayerController {
     private final GetPlayerUseCase getPlayerUseCase;
 
     @PostMapping()
-    public ResponseEntity<CreatePlayerResponse> registerPlayer(@RequestBody CreatePlayerRequest request) {
+    public ResponseEntity<CreatePlayerResponse> registerPlayer(@Valid @RequestBody CreatePlayerRequest request) {
+        System.out.println("Received Request: " + request);
         CreatePlayerResponse response = createPlayerUseCase.createPlayer(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }

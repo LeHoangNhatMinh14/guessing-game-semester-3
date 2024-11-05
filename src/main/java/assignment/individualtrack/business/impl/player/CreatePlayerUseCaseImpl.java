@@ -15,10 +15,11 @@ public class CreatePlayerUseCaseImpl implements CreatePlayerUseCase {
 
     @Override
     public CreatePlayerResponse createPlayer(CreatePlayerRequest player) {
+        System.out.println("CreatePlayerRequest: " + player);
         if (playerRepo.existsByName(player.getName())) {
             return null;
         }
-
+        System.out.println("CreatePlayerResponse: " + player);
         PlayerEntity playerEntity = saveNewPlayer(player);
         return CreatePlayerResponse.builder()
                 .playerId(playerEntity.getId())
@@ -28,6 +29,8 @@ public class CreatePlayerUseCaseImpl implements CreatePlayerUseCase {
     private PlayerEntity saveNewPlayer(CreatePlayerRequest request) {
         PlayerEntity newPlayer = PlayerEntity.builder()
                 .name(request.getName())
+                .password(request.getPassword())
+                .highscore(0)  // Set highScore to 0 for new players
                 .build();
 
         return playerRepo.save(newPlayer);
