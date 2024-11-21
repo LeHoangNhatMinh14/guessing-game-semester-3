@@ -1,7 +1,7 @@
 package assignment.individualtrack.business.impl.player;
 
 import assignment.individualtrack.business.exception.InvalidPlayerException;
-import assignment.individualtrack.business.intefaces.GetPlayerUseCase;
+import assignment.individualtrack.business.intefaces.GetPlayerbyIdUseCase;
 import assignment.individualtrack.domain.Player.GetPlayerRequest;
 import assignment.individualtrack.domain.Player.GetPlayerResponse;
 import assignment.individualtrack.persistence.PlayerRepo;
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
-public class GetPlayerUseCaseImpl implements GetPlayerUseCase {
+public class GetPlayerbyIdUseCaseImpl implements GetPlayerbyIdUseCase {
 
     private final PlayerRepo playerRepo;
 

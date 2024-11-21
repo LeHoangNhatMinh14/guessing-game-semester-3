@@ -1,4 +1,4 @@
-package assignment.individualtrack;
+package assignment.individualtrack.theme;
 
 import assignment.individualtrack.business.impl.themes.GetAllWordsofThemeUseCaseImpl;
 import assignment.individualtrack.domain.Themes.GetAllWordsofThemeRequest;

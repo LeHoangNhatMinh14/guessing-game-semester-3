@@ -3,6 +3,7 @@ plugins {
     id 'org.springframework.boot' version '3.3.3'
     id 'io.spring.dependency-management' version '1.1.6'
     id "org.sonarqube" version "5.1.0.4882"
+    id 'jacoco'
 }
 
 group = 'assignment'
@@ -25,24 +26,39 @@ repositories {
 }
 
 dependencies {
+    // Spring Boot and Web
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa' // JPA dependency
     implementation 'org.springframework.boot:spring-boot-starter-validation' // Validation
-    implementation 'mysql:mysql-connector-java:8.0.33' // MySQL connector
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+
+    // Database and Flyway
+    implementation 'mysql:mysql-connector-java:8.0.33' // MySQL connector for production
     implementation 'org.flywaydb:flyway-core'
     implementation 'org.flywaydb:flyway-mysql' // Flyway MySQL support
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0' // OpenAPI documentation
 
+    // OpenAPI Documentation
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0'
+
+    // Lombok
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
+    // Testing
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    runtimeOnly 'com.h2database:h2'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testRuntimeOnly 'com.h2database:h2' // H2 database for testing
 }
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+jacocoTestReport {
+    dependsOn test // Ensures tests are run before generating the report
+    reports {
+        xml.required = true
+        html.required = true
+    }
 }
 
 sonar {
@@ -50,6 +66,7 @@ sonar {
         property "sonar.projectKey", "game"
         property "sonar.projectName", "game"
         property "sonar.qualitygate.wait", true
+        property "sonar.coverage.jacoco.xmlReportPaths", "$buildDir/reports/jacoco/test/jacocoTestReport.xml"
+        property "sonar.exclusions", "**/generated/**, **/lombok/**/*.class"
     }
 }
-

@@ -3,6 +3,6 @@ package assignment.individualtrack.business.intefaces;
 import assignment.individualtrack.domain.Player.GetPlayerRequest;
 import assignment.individualtrack.domain.Player.GetPlayerResponse;
 
-public interface GetPlayerUseCase {
+public interface GetPlayerbyIdUseCase {
     GetPlayerResponse getPlayer(GetPlayerRequest request);
 }

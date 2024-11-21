@@ -14,6 +14,11 @@ public class CreateGameUseCaseImpl implements CreateGameUseCase {
     private final GameRepo gameRepo;
     @Override
     public StartGameResponse createGame(StartGameRequest startGameRequest) {
+        // Check if playerID is null
+        if (startGameRequest.getPlayerID() == null) {
+            throw new IllegalArgumentException("Player ID cannot be null");
+        }
+
         // Save the new game with initial values (score and time set to 0)
         GameEntity newGame = GameEntity.builder()
                 .id(startGameRequest.getPlayerID()) // Only playerID is necessary when starting
@@ -26,7 +31,8 @@ public class CreateGameUseCaseImpl implements CreateGameUseCase {
         // Return the response with gameId and playerId
         return StartGameResponse.builder()
                 .gameId(savedGame.getId())
-                .playerId(savedGame.getId())
+                .playerId(savedGame.getId())  // It looks like playerId should match the playerId in the request
                 .build();
     }
+
 }

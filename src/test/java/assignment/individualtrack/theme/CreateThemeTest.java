@@ -1,4 +1,4 @@
-package assignment.individualtrack;
+package assignment.individualtrack.theme;
 
 import assignment.individualtrack.business.impl.themes.CreateThemeUseCaseImpl;
 import assignment.individualtrack.domain.Themes.CreateThemeRequest;

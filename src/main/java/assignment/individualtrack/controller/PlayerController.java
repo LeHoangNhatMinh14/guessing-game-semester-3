@@ -1,9 +1,6 @@
 package assignment.individualtrack.controller;
 
-import assignment.individualtrack.business.intefaces.CreatePlayerUseCase;
-import assignment.individualtrack.business.intefaces.DeletePlayerUseCase;
-import assignment.individualtrack.business.intefaces.EditPlayerUseCase;
-import assignment.individualtrack.business.intefaces.GetPlayerUseCase;
+import assignment.individualtrack.business.intefaces.*;
 import assignment.individualtrack.domain.Player.*;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -18,11 +15,11 @@ public class PlayerController {
     private final CreatePlayerUseCase createPlayerUseCase;
     private final EditPlayerUseCase editPlayerUseCase;
     private final DeletePlayerUseCase deletePlayerUseCase;
-    private final GetPlayerUseCase getPlayerUseCase;
+    private final GetPlayerbyIdUseCase getPlayerbyIdUseCase;
+    private final LoginUseCase loginUseCase;
 
     @PostMapping()
     public ResponseEntity<CreatePlayerResponse> registerPlayer(@Valid @RequestBody CreatePlayerRequest request) {
-        System.out.println("Received Request: " + request);
         CreatePlayerResponse response = createPlayerUseCase.createPlayer(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -43,7 +40,15 @@ public class PlayerController {
     @GetMapping("/{id}")
     public ResponseEntity<GetPlayerResponse> getPlayer(@PathVariable long id) {
         GetPlayerRequest request = GetPlayerRequest.builder().playerId(id).build();
-        GetPlayerResponse response = getPlayerUseCase.getPlayer(request);
+        GetPlayerResponse response = getPlayerbyIdUseCase.getPlayer(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponse> Login(@RequestBody LoginRequest request)
+    {
+        System.out.println("Login method called with username: " + request.getName());
+        LoginResponse response = loginUseCase.login(request);
         return ResponseEntity.ok(response);
     }
 }

@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 @Builder
 public class EndGameRequest {
-    private int gameId;
+    private long gameId;
     private int score;
     private int time;
     private int correctGuesses;

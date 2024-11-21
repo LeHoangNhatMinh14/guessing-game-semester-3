@@ -16,7 +16,7 @@ public class GetGameUseCaseImpl implements GetGameUseCase {
 
     @Override
     public GetGameResponse getGame(GetGameRequest request){
-        GameEntity gameEntity = gameRepo.findById((int)request.getGameID())
+        GameEntity gameEntity = gameRepo.findById(request.getGameID())
                 .orElseThrow(() -> new GameNotFoundException("Game with ID " + request.getGameID() + " not found"));
 
         // Map GameEntity to GetGameResponse
