@@ -5,7 +5,7 @@ import assignment.individualtrack.domain.Player.LoginRequest;
 import assignment.individualtrack.domain.Player.LoginResponse;
 import assignment.individualtrack.persistence.PlayerRepo;
 import lombok.AllArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
+//import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
@@ -14,7 +14,7 @@ import java.util.Objects;
 @AllArgsConstructor
 public class LoginUseCaseImpl implements LoginUseCase {
     private final PlayerRepo playerRepository;
-    private final PasswordEncoder passwordEncoder; // Spring Security Password Encoder
+//    private final PasswordEncoder passwordEncoder; // Spring Security Password Encoder
 
     @Override
     public LoginResponse login(LoginRequest request) {
