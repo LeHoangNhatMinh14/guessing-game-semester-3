@@ -1,13 +1,14 @@
 package assignment.individualtrack.controller;
 
-import assignment.individualtrack.business.intefaces.AddWordToThemeUseCase;
-import assignment.individualtrack.business.intefaces.CreateThemeUseCase;
-import assignment.individualtrack.business.intefaces.GetAllThemeUseCase;
-import assignment.individualtrack.business.intefaces.GetAllWordsofThemUseCase;
+import assignment.individualtrack.business.exception.ThemeNotFoundException;
+import assignment.individualtrack.business.exception.WordNotFoundException;
+import assignment.individualtrack.business.intefaces.*;
 import assignment.individualtrack.domain.Themes.*;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -19,6 +20,8 @@ public class ThemeController {
     private final CreateThemeUseCase addThemeUseCase;
     private final GetAllWordsofThemUseCase getAllWordsofThemUseCase;
     private final GetAllThemeUseCase getAllThemesUseCase;
+    private final DeleteThemeUseCase deleteThemeUseCase;
+    private final DeleteWordFromThemeUseCase deleteWordFromThemeUseCase;
 
     @PostMapping("/words")
     public ResponseEntity<String> addWordToTheme(@RequestBody AddWordToThemeRequest request) {
@@ -72,4 +75,26 @@ public class ThemeController {
         return ResponseEntity.ok(response);
     }
 
+    @DeleteMapping("/{themeId}")
+    public ResponseEntity<Void> deleteTheme(@PathVariable Long themeId) {
+        deleteThemeUseCase.deleteTheme(themeId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{themeId}/words")
+    public ResponseEntity<String> deleteWordFromTheme(@PathVariable Long themeId, @RequestBody String word) {
+        // Validate the input word
+        if (word == null || word.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("Word cannot be empty.");
+        }
+
+        // Handle the deletion
+        try {
+            deleteWordFromThemeUseCase.deleteWord(word.trim(), themeId);
+        } catch (ThemeNotFoundException | WordNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+
+        return ResponseEntity.ok("Word deleted from theme.");
+    }
 }

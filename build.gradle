@@ -30,7 +30,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa' // JPA dependency
     implementation 'org.springframework.boot:spring-boot-starter-validation' // Validation
-//    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
 
     // Database and Flyway
     implementation 'mysql:mysql-connector-java:8.0.33' // MySQL connector for production
@@ -39,6 +39,12 @@ dependencies {
 
     // OpenAPI Documentation
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0'
+
+    //JWT
+    implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5' // For JSON serialization
+    implementation 'javax.servlet:javax.servlet-api:4.0.1'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
     // Lombok
     compileOnly 'org.projectlombok:lombok'
@@ -68,5 +74,8 @@ sonar {
         property "sonar.qualitygate.wait", true
         property "sonar.coverage.jacoco.xmlReportPaths", "$buildDir/reports/jacoco/test/jacocoTestReport.xml"
         property "sonar.exclusions", "**/generated/**, **/lombok/**/*.class"
+        property "sonar.sources", "src/main/java"
+        property "sonar.tests", "src/test/java"
     }
 }
+

@@ -1,5 +1,6 @@
 package assignment.individualtrack;
 
+import assignment.individualtrack.persistence.Role;
 import assignment.individualtrack.persistence.entity.PlayerEntity;
 import assignment.individualtrack.persistence.PlayerRepo;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,6 +30,7 @@ public class PlayerRepoIntegrationTest {
                 .name("JohnDoe")
                 .password("password123")
                 .highscore(100)
+                .role(Role.USER)
                 .build();
         playerRepo.save(player);
 
@@ -46,6 +48,7 @@ public class PlayerRepoIntegrationTest {
                 .name("JaneDoe")
                 .password("securePass")
                 .highscore(150)
+                .role(Role.USER)
                 .build();
         PlayerEntity savedPlayer = playerRepo.save(player);
 
@@ -57,6 +60,7 @@ public class PlayerRepoIntegrationTest {
         assertThat(foundPlayer.get().getName()).isEqualTo("JaneDoe");
         assertThat(foundPlayer.get().getHighscore()).isEqualTo(150);
         assertThat(foundPlayer.get().getPassword()).isEqualTo("securePass");
+        assertThat(foundPlayer.get().getRole()).isEqualTo(Role.USER);
     }
 
     @Test
@@ -66,6 +70,7 @@ public class PlayerRepoIntegrationTest {
                 .name("DeleteMe")
                 .password("deletePass")
                 .highscore(200)
+                .role(Role.USER)
                 .build();
         PlayerEntity savedPlayer = playerRepo.save(player);
 
@@ -84,6 +89,7 @@ public class PlayerRepoIntegrationTest {
                 .name("FindMe")
                 .password("findPass")
                 .highscore(300)
+                .role(Role.USER)
                 .build();
         playerRepo.save(player);
 
@@ -95,5 +101,6 @@ public class PlayerRepoIntegrationTest {
         assertThat(foundPlayer.get().getName()).isEqualTo("FindMe");
         assertThat(foundPlayer.get().getHighscore()).isEqualTo(300);
         assertThat(foundPlayer.get().getPassword()).isEqualTo("findPass");
+        assertThat(foundPlayer.get().getRole()).isEqualTo(Role.USER);
     }
 }

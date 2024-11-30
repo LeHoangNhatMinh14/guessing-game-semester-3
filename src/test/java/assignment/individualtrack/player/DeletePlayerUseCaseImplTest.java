@@ -3,6 +3,7 @@ package assignment.individualtrack.player;
 import assignment.individualtrack.business.exception.PlayerNotFoundException;
 import assignment.individualtrack.business.impl.player.DeletePlayerUseCaseImpl;
 import assignment.individualtrack.persistence.PlayerRepo;
+import assignment.individualtrack.persistence.Role;
 import assignment.individualtrack.persistence.entity.PlayerEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,7 +34,7 @@ class DeletePlayerUseCaseImplTest {
     @Test
     void shouldDeletePlayerWhenPlayerExists() {
         Long playerId = 1L;
-        PlayerEntity mockPlayer = new PlayerEntity(playerId, "John", 100, "123");
+        PlayerEntity mockPlayer = new PlayerEntity(playerId, "John", 100, "123", Role.USER);
 
         // Mock existsById to return true, meaning player exists
         when(playerRepo.existsById(playerId)).thenReturn(true);

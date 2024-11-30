@@ -1,5 +1,6 @@
 package assignment.individualtrack.persistence.entity;
 
+import assignment.individualtrack.persistence.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -28,5 +29,7 @@ public class PlayerEntity {
     @Column(name = "password", nullable = false)
     private String password;
 
-
+    @Enumerated(EnumType.STRING) // Use Enum for roles
+    @Column(name = "role", nullable = false)
+    private Role role; // e.g., USER, ADMIN
 }

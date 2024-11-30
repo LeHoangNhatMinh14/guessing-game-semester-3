@@ -5,13 +5,15 @@ import assignment.individualtrack.domain.Player.LoginRequest;
 import assignment.individualtrack.domain.Player.LoginResponse;
 import assignment.individualtrack.persistence.PlayerRepo;
 import assignment.individualtrack.persistence.entity.PlayerEntity;
+import io.jsonwebtoken.JwtException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
-import java.util.Optional;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -19,7 +21,10 @@ import static org.mockito.Mockito.*;
 class LoginUseCaseImplTest {
 
     @Mock
-    private PlayerRepo playerRepository;
+    private PlayerRepo playerRepo;
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     @InjectMocks
     private LoginUseCaseImpl loginUseCase;
@@ -30,21 +35,18 @@ class LoginUseCaseImplTest {
     }
 
     @Test
-    void shouldReturnResponseWhenCredentialsAreCorrect() {
+    void login_successful() {
         // Arrange
-        String username = "PlayerOne";
-        String password = "securepassword";
+        LoginRequest request = new LoginRequest("validUser", "validPassword");
+
         PlayerEntity player = PlayerEntity.builder()
-                .name(username)
-                .password(password) // Assume plain text for simplicity in this test
+                .name("validUser")
+                .password("encodedPassword")
+                .role(assignment.individualtrack.persistence.Role.USER) // Added role to prevent NPE
                 .build();
 
-        when(playerRepository.findByName(username)).thenReturn(Optional.of(player));
-
-        LoginRequest request = LoginRequest.builder()
-                .name(username)
-                .password(password)
-                .build();
+        when(playerRepo.findByName(request.getName())).thenReturn(java.util.Optional.of(player));
+        when(passwordEncoder.matches(request.getPassword(), player.getPassword())).thenReturn(true);
 
         // Act
         LoginResponse response = loginUseCase.login(request);
@@ -52,48 +54,37 @@ class LoginUseCaseImplTest {
         // Assert
         assertNotNull(response);
         assertEquals("Login successful", response.getMessage());
-        assertEquals("dummy-token", response.getToken()); // Verify token logic
-        verify(playerRepository, times(1)).findByName(username);
+        assertNotNull(response.getToken());
     }
 
     @Test
-    void shouldThrowExceptionWhenUserDoesNotExist() {
+    void login_userNotFound() {
         // Arrange
-        String username = "NonExistentPlayer";
-        when(playerRepository.findByName(username)).thenReturn(Optional.empty());
+        LoginRequest request = new LoginRequest("unknownUser", "password");
 
-        LoginRequest request = LoginRequest.builder()
-                .name(username)
-                .password("irrelevant")
-                .build();
+        when(playerRepo.findByName(request.getName())).thenReturn(java.util.Optional.empty());
 
         // Act & Assert
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> loginUseCase.login(request));
+        UsernameNotFoundException exception = assertThrows(UsernameNotFoundException.class, () -> loginUseCase.login(request));
         assertEquals("User not found", exception.getMessage());
-        verify(playerRepository, times(1)).findByName(username);
     }
 
     @Test
-    void shouldThrowExceptionWhenPasswordIsInvalid() {
+    void login_invalidPassword() {
         // Arrange
-        String username = "PlayerOne";
-        String correctPassword = "securepassword";
-        String incorrectPassword = "wrongpassword";
+        LoginRequest request = new LoginRequest("validUser", "wrongPassword");
+
         PlayerEntity player = PlayerEntity.builder()
-                .name(username)
-                .password(correctPassword) // Assume plain text for simplicity in this test
+                .name("validUser")
+                .password("encodedPassword")
+                .role(assignment.individualtrack.persistence.Role.USER) // Added role to prevent NPE
                 .build();
 
-        when(playerRepository.findByName(username)).thenReturn(Optional.of(player));
-
-        LoginRequest request = LoginRequest.builder()
-                .name(username)
-                .password(incorrectPassword)
-                .build();
+        when(playerRepo.findByName(request.getName())).thenReturn(java.util.Optional.of(player));
+        when(passwordEncoder.matches(request.getPassword(), player.getPassword())).thenReturn(false);
 
         // Act & Assert
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> loginUseCase.login(request));
+        BadCredentialsException exception = assertThrows(BadCredentialsException.class, () -> loginUseCase.login(request));
         assertEquals("Invalid password", exception.getMessage());
-        verify(playerRepository, times(1)).findByName(username);
     }
 }

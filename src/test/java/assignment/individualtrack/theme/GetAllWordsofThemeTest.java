@@ -17,7 +17,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
-class GetAllWordsofThemeUseCaseImplTest {
+class GetAllWordsofThemeTest {
 
     @Mock
     private ThemeRepo themeRepo;
