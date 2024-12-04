@@ -24,9 +24,10 @@ public class EndGameUseCaseImpl implements EndGameUseCase {
             throw new IllegalStateException("Game has already been completed.");
         }
 
-        gameEntity.setScore(endGameRequest.getScore());
+        int score = (endGameRequest.getCorrectGuesses() - endGameRequest.getIncorrectGuesses());
+        gameEntity.setScore(score);
         gameEntity.setTime(endGameRequest.getTime());
-        gameEntity.setStatus(GameStatus.COMPLETED);
+        gameEntity.setStatus(endGameRequest.getStatus());
 
         // Save the updated game entity
         gameRepo.save(gameEntity);

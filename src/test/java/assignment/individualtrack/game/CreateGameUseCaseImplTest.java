@@ -1,25 +1,32 @@
 package assignment.individualtrack.game;
 
 import assignment.individualtrack.business.impl.game.CreateGameUseCaseImpl;
+import assignment.individualtrack.domain.Game.GameStatus;
 import assignment.individualtrack.domain.Game.StartGameRequest;
 import assignment.individualtrack.domain.Game.StartGameResponse;
 import assignment.individualtrack.persistence.GameRepo;
+import assignment.individualtrack.persistence.PlayerRepo;
 import assignment.individualtrack.persistence.entity.GameEntity;
+import assignment.individualtrack.persistence.entity.PlayerEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.*;
 
 class CreateGameUseCaseImplTest {
 
     @Mock
     private GameRepo gameRepo;
+
+    @Mock
+    private PlayerRepo playerRepo;
 
     @InjectMocks
     private CreateGameUseCaseImpl createGameUseCase;
@@ -30,64 +37,78 @@ class CreateGameUseCaseImplTest {
     }
 
     @Test
-    void shouldThrowExceptionWhenRequestIsNull() {
-        // Act & Assert
-        assertThrows(NullPointerException.class, () -> createGameUseCase.createGame(null));
+    void createGame_happyPath_shouldCreateGameSuccessfully() {
+        // Arrange
+        Long playerId = 1L;
+        PlayerEntity playerEntity = new PlayerEntity();
+        playerEntity.setId(playerId);
+
+        StartGameRequest request = StartGameRequest.builder()
+                .playerID(playerId)
+                .build();
+
+        when(playerRepo.findById(playerId)).thenReturn(Optional.of(playerEntity));
+
+        ArgumentCaptor<GameEntity> gameEntityCaptor = ArgumentCaptor.forClass(GameEntity.class);
+
+        GameEntity savedGameEntity = GameEntity.builder()
+                .id(10L)
+                .player(playerEntity)
+                .score(0)
+                .time(0)
+                .status(GameStatus.IN_PROGRESS)
+                .build();
+
+        when(gameRepo.save(any(GameEntity.class))).thenReturn(savedGameEntity);
+
+        // Act
+        StartGameResponse response = createGameUseCase.createGame(request);
+
+        // Assert
+        assertNotNull(response);
+        assertEquals(10L, response.getGameId());
+        assertEquals(playerId, response.getPlayerId());
+
+        verify(playerRepo).findById(playerId);
+        verify(gameRepo).save(gameEntityCaptor.capture());
+
+        GameEntity capturedGameEntity = gameEntityCaptor.getValue();
+        assertEquals(playerEntity, capturedGameEntity.getPlayer());
+        assertEquals(0, capturedGameEntity.getScore());
+        assertEquals(0, capturedGameEntity.getTime());
+        assertEquals(GameStatus.IN_PROGRESS, capturedGameEntity.getStatus());
     }
 
     @Test
-    void shouldThrowExceptionWhenPlayerIdIsNull() {
+    void createGame_nullPlayerId_shouldThrowException() {
         // Arrange
-        StartGameRequest startGameRequest = StartGameRequest.builder()
+        StartGameRequest request = StartGameRequest.builder()
                 .playerID(null)
                 .build();
 
         // Act & Assert
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> createGameUseCase.createGame(startGameRequest));
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> createGameUseCase.createGame(request));
         assertEquals("Player ID cannot be null", exception.getMessage());
+
+        verifyNoInteractions(playerRepo);
+        verifyNoInteractions(gameRepo);
     }
 
     @Test
-    void shouldHandleDatabaseErrorGracefully() {
+    void createGame_playerNotFound_shouldThrowException() {
         // Arrange
-        long playerId = 1L;
-        StartGameRequest startGameRequest = StartGameRequest.builder()
+        Long playerId = 1L;
+        StartGameRequest request = StartGameRequest.builder()
                 .playerID(playerId)
                 .build();
 
-        doThrow(new RuntimeException("Database error")).when(gameRepo).save(any(GameEntity.class));
+        when(playerRepo.findById(playerId)).thenReturn(Optional.empty());
 
         // Act & Assert
-        RuntimeException exception = assertThrows(RuntimeException.class,
-                () -> createGameUseCase.createGame(startGameRequest));
-        assertEquals("Database error", exception.getMessage());
-    }
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> createGameUseCase.createGame(request));
+        assertEquals("Player not found with ID: " + playerId, exception.getMessage());
 
-    @Test
-    void shouldInitializeScoreAndTimeToZeroForNewGame() {
-        // Arrange
-        long playerId = 2L;
-        long gameId = 20L;
-
-        StartGameRequest startGameRequest = StartGameRequest.builder()
-                .playerID(playerId)
-                .build();
-
-        GameEntity savedGame = GameEntity.builder()
-                .id(gameId)
-                .score(0) // Validate score
-                .time(0)  // Validate time
-                .build();
-
-        when(gameRepo.save(any(GameEntity.class))).thenReturn(savedGame);
-
-        // Act
-        StartGameResponse response = createGameUseCase.createGame(startGameRequest);
-
-        // Assert
-        assertNotNull(response);
-        assertEquals(0, savedGame.getScore());
-        assertEquals(0, savedGame.getTime());
+        verify(playerRepo).findById(playerId);
+        verifyNoInteractions(gameRepo);
     }
 }

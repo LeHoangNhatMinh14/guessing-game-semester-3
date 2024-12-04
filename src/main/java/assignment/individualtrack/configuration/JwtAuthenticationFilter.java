@@ -36,25 +36,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 String username = claims.getSubject(); // Retrieve the subject (username)
                 String role = claims.get("role", String.class); // Retrieve the role claim
+                Long playerId = claims.get("id", Long.class); // Retrieve the player ID
 
-                // Log decoded claims
-//                System.out.println("Decoded Claims: " + claims);
-//                System.out.println("Username: " + username);
-//                System.out.println("Role: " + role);
+                if (username != null && role != null && playerId != null) {
+                    List<org.springframework.security.core.GrantedAuthority> authorities = List.of(() -> role);
 
-                List<org.springframework.security.core.GrantedAuthority> authorities = List.of(() -> role);
+                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                            username, null, authorities
+                    );
+                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                        username, null, authorities
-                );
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-                // Set the SecurityContext
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                    // Set the SecurityContext with authentication
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
 
             } catch (Exception e) {
-                System.out.println("Token validation failed: " + e.getMessage());
                 SecurityContextHolder.clearContext();
+                // Log exception for better debugging
+                System.err.println("Failed to parse JWT: " + e.getMessage());
             }
         }
 

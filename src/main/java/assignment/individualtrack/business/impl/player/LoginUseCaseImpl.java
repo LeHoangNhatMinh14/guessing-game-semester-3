@@ -43,15 +43,16 @@ public class LoginUseCaseImpl implements LoginUseCase {
         }
 
         // Generate a JWT token
-        String token = generateToken(player.getName(), "ROLE_" + player.getRole().name());
+        String token = generateToken(player.getName(), "ROLE_" + player.getRole().name(), player.getId());
 
-        return new LoginResponse("Login successful", token);
+        return new LoginResponse("Login successful", token, player.getId());
     }
 
 
-    private String generateToken(String username, String role) {
+    private String generateToken(String username, String role, Long id) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("role", role); // Add ROLE_ prefix here
+        claims.put("id", id);
 
         return Jwts.builder()
                 .setClaims(claims)

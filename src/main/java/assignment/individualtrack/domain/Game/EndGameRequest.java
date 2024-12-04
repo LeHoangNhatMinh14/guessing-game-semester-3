@@ -9,6 +9,7 @@ public class EndGameRequest {
     private long gameId;
     private int score;
     private int time;
+    private GameStatus status;
     private int correctGuesses;
     private int incorrectGuesses;
 }

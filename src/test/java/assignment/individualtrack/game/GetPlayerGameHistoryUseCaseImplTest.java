@@ -1,7 +1,6 @@
 package assignment.individualtrack.game;
 
 import assignment.individualtrack.business.impl.game.GetPlayerGameHistoryUseCaseImpl;
-import assignment.individualtrack.business.intefaces.GetPlayerGameHistoryUseCase;
 import assignment.individualtrack.domain.Game.GameStatus;
 import assignment.individualtrack.domain.Game.GetPlayerGameHistoryRequest;
 import assignment.individualtrack.domain.Game.GetPlayerGameHistoryResponse;

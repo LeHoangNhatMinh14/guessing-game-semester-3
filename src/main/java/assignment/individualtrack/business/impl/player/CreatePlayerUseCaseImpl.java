@@ -9,12 +9,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import assignment.individualtrack.persistence.PlayerRepo;
 import assignment.individualtrack.persistence.entity.PlayerEntity;
-import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 
 import javax.crypto.SecretKey;
-import java.util.Date;
 
 @Service
 @AllArgsConstructor

@@ -2,9 +2,6 @@ package assignment.individualtrack.controller;
 
 import assignment.individualtrack.business.intefaces.*;
 import assignment.individualtrack.domain.Player.*;
-import assignment.individualtrack.persistence.Role;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -36,7 +33,6 @@ public class PlayerController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CreatePlayerResponse> updatePlayer(@PathVariable long id, @RequestBody EditPlayerRequest request) {
         request.setId(id);
         editPlayerUseCase.editPlayer(request);
@@ -44,7 +40,6 @@ public class PlayerController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deletePlayer(@PathVariable long id) {
         deletePlayerUseCase.deletePlayer(id);
         return ResponseEntity.noContent().build();

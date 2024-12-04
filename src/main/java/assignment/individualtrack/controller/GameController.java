@@ -20,8 +20,9 @@ public class GameController {
     private final GetPlayerGameHistoryUseCase getPlayerGameHistoryUseCase;
 
     // Endpoint to start a new game
-    @PostMapping("/start")
+    @PostMapping("/startNew")
     public ResponseEntity<StartGameResponse> startGame(@RequestBody StartGameRequest startGameRequest) {
+        System.out.println("Received player ID: " + startGameRequest.getPlayerID());
         StartGameResponse response = createGameUseCase.createGame(startGameRequest);
         return ResponseEntity.ok(response);
     }

@@ -23,46 +23,39 @@ public class ThemeController {
     private final DeleteThemeUseCase deleteThemeUseCase;
     private final DeleteWordFromThemeUseCase deleteWordFromThemeUseCase;
 
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/words")
     public ResponseEntity<String> addWordToTheme(@RequestBody AddWordToThemeRequest request) {
-        // Validate that the word is not null or empty
         String word = request.getWord();
         if (word == null || word.trim().isEmpty()) {
             return ResponseEntity.badRequest().body("Word cannot be empty.");
         }
-
-        // Check if the theme exists
         try {
             addWordToThemeUseCase.addwordtoTheme(request);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
-
         return ResponseEntity.ok("Word added to theme.");
     }
 
+    @PreAuthorize("isAuthenticated()")
     @PostMapping
     public ResponseEntity<String> createTheme(@RequestBody CreateThemeRequest request) {
         String themeName = request.getThemeName();
         if (themeName == null || themeName.isEmpty()) {
             return ResponseEntity.badRequest().body("Theme name cannot be empty");
         }
-
         addThemeUseCase.createTheme(request);
-
         return ResponseEntity.ok("Theme created");
     }
 
     @GetMapping("/{themeId}/words")
     public ResponseEntity<GetAllWordsofThemesResponse> getThemes(@PathVariable Long themeId) {
         GetAllWordsofThemeRequest request = new GetAllWordsofThemeRequest(themeId);
-
         GetAllWordsofThemesResponse response = getAllWordsofThemUseCase.getAllWords(request);
-
         if (response == null || response.getWords().isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-
         return ResponseEntity.ok(response);
     }
 
@@ -75,26 +68,25 @@ public class ThemeController {
         return ResponseEntity.ok(response);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{themeId}")
     public ResponseEntity<Void> deleteTheme(@PathVariable Long themeId) {
         deleteThemeUseCase.deleteTheme(themeId);
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{themeId}/words")
     public ResponseEntity<String> deleteWordFromTheme(@PathVariable Long themeId, @RequestBody String word) {
-        // Validate the input word
         if (word == null || word.trim().isEmpty()) {
             return ResponseEntity.badRequest().body("Word cannot be empty.");
         }
-
-        // Handle the deletion
         try {
             deleteWordFromThemeUseCase.deleteWord(word.trim(), themeId);
         } catch (ThemeNotFoundException | WordNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
-
         return ResponseEntity.ok("Word deleted from theme.");
     }
 }
+
