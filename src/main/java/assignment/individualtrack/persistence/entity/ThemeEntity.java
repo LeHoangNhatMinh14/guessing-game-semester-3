@@ -25,6 +25,5 @@ public class ThemeEntity {
 
     @ElementCollection
     @CollectionTable(name = "theme_words", joinColumns = @JoinColumn(name = "theme_id"))
-    @Column(name = "word")
-    private List<String> words;
+    private List<WordImage> words; // Now refers to WordImage instead of String
 }

@@ -8,4 +8,5 @@ import lombok.Data;
 public class AddWordThemeResponse {
     private Long themeId;
     private String word;
+    private String imageUrl; // Add this to return the URL of the uploaded image
 }

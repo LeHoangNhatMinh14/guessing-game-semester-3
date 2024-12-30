@@ -40,7 +40,7 @@ dependencies {
     // OpenAPI Documentation
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0'
 
-    //JWT
+    // JWT
     implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
     implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5' // For JSON serialization
     implementation 'javax.servlet:javax.servlet-api:4.0.1'
@@ -49,6 +49,12 @@ dependencies {
     // Lombok
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
+
+    // HTTP Client and JSON Parsing for Imgur Integration
+    implementation 'org.apache.httpcomponents:httpclient:4.5.13' // HTTP client for requests
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2' // JSON parsing
+    implementation 'org.apache.httpcomponents:httpclient:4.5.13' // Core HTTP Client
+    implementation 'org.apache.httpcomponents:httpmime:4.5.13'   // MIME handling for file uploads
 
     // Testing
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -78,4 +84,3 @@ sonar {
         property "sonar.tests", "src/test/java"
     }
 }
-

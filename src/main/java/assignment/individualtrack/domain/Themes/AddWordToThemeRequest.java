@@ -8,4 +8,5 @@ import lombok.Data;
 public class AddWordToThemeRequest {
     private Long themeId;
     private String word;
+    private byte[] image; // Add this to receive the image file as bytes
 }

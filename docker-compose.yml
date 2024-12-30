@@ -19,7 +19,6 @@ services:
       timeout: 5s
       retries: 5
 
-
   app:
     build:
       context: .
@@ -32,13 +31,16 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     networks:
       - my-network
-
+    volumes:
+      - gradle-cache:/home/gradle/.gradle # Cache Gradle dependencies
 
 volumes:
   db-data:
+  gradle-cache: # For Gradle caching
 
 networks:
   my-network:

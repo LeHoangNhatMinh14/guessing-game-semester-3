@@ -8,8 +8,10 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/themes")
@@ -24,19 +26,34 @@ public class ThemeController {
     private final DeleteWordFromThemeUseCase deleteWordFromThemeUseCase;
 
     @PreAuthorize("isAuthenticated()")
-    @PostMapping("/words")
-    public ResponseEntity<String> addWordToTheme(@RequestBody AddWordToThemeRequest request) {
-        String word = request.getWord();
-        if (word == null || word.trim().isEmpty()) {
-            return ResponseEntity.badRequest().body("Word cannot be empty.");
-        }
+    @PostMapping(value = "/words", consumes = "multipart/form-data")
+    public ResponseEntity<String> addWordToTheme(
+            @RequestParam("themeId") Long themeId,
+            @RequestParam("word") String word,
+            @RequestPart(value = "image", required = false) MultipartFile image) {
         try {
+            byte[] imageBytes = null;
+            if (image != null) {
+                try {
+                    imageBytes = image.getBytes();
+                } catch (IOException e) {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to read image file.");
+                }
+            }
+
+            AddWordToThemeRequest request = AddWordToThemeRequest.builder()
+                    .themeId(themeId)
+                    .word(word)
+                    .image(imageBytes)
+                    .build();
+
             addWordToThemeUseCase.addwordtoTheme(request);
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
         return ResponseEntity.ok("Word added to theme.");
     }
+
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping
