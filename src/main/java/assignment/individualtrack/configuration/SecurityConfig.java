@@ -10,6 +10,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -30,12 +31,18 @@ public class SecurityConfig {
     }
 
     @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
+
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable()) // Disable CSRF for stateless APIs
                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Enable CORS
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/players/login", "/players/register").permitAll() // Allow login and registration
+                        .requestMatchers(HttpMethod.GET, "/themes", "/themes/**").permitAll() // Allow all themes and words-related requests
                         .requestMatchers(HttpMethod.GET, "/themes", "/themes/{themeId}/words").permitAll() // Allow all users to view themes and words
                         .requestMatchers(HttpMethod.POST, "/themes", "/themes/words").authenticated() // Require authentication for creating themes or adding words
                         .requestMatchers(HttpMethod.PUT, "/themes/{themeId}/words").hasRole("ADMIN") // Require ADMIN role for deleting words from a theme

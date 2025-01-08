@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 @RequestMapping("/themes")
@@ -24,6 +26,7 @@ public class ThemeController {
     private final GetAllThemeUseCase getAllThemesUseCase;
     private final DeleteThemeUseCase deleteThemeUseCase;
     private final DeleteWordFromThemeUseCase deleteWordFromThemeUseCase;
+    private final GetThemeStatisticsUseCase getThemeStatisticsUseCase;
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping(value = "/words", consumes = "multipart/form-data")
@@ -67,12 +70,17 @@ public class ThemeController {
     }
 
     @GetMapping("/{themeId}/words")
-    public ResponseEntity<GetAllWordsofThemesResponse> getThemes(@PathVariable Long themeId) {
-        GetAllWordsofThemeRequest request = new GetAllWordsofThemeRequest(themeId);
+    public ResponseEntity<GetAllWordsofThemesResponse> getThemes(
+            @PathVariable Long themeId,
+            @RequestParam(required = false) String name) {
+
+        GetAllWordsofThemeRequest request = new GetAllWordsofThemeRequest(themeId, name);
         GetAllWordsofThemesResponse response = getAllWordsofThemUseCase.getAllWords(request);
+
         if (response == null || response.getWords().isEmpty()) {
             return ResponseEntity.notFound().build();
         }
+
         return ResponseEntity.ok(response);
     }
 
@@ -105,5 +113,26 @@ public class ThemeController {
         }
         return ResponseEntity.ok("Word deleted from theme.");
     }
+
+    @GetMapping("/statistics")
+    public ResponseEntity<List<GetThemeStatisticsResponse>> getThemeStatistics(
+            @RequestParam("startDate") String startDate,
+            @RequestParam("endDate") String endDate) {
+        try {
+            LocalDateTime start = LocalDateTime.parse(startDate);
+            LocalDateTime end = LocalDateTime.parse(endDate);
+
+            // Use the service implementation to fetch data
+            List<GetThemeStatisticsResponse> statistics = getThemeStatisticsUseCase.execute(start,end);
+
+            if (statistics == null || statistics.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            }
+            return ResponseEntity.ok(statistics);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+    }
+
 }
 

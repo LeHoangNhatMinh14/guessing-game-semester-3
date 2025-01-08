@@ -15,7 +15,7 @@ public class GetGameUseCaseImpl implements GetGameUseCase {
     private final GameRepo gameRepo;
 
     @Override
-    public GetGameResponse getGame(GetGameRequest request){
+    public GetGameResponse getGame(GetGameRequest request) {
         GameEntity gameEntity = gameRepo.findById(request.getGameID())
                 .orElseThrow(() -> new GameNotFoundException("Game with ID " + request.getGameID() + " not found"));
 
@@ -24,7 +24,9 @@ public class GetGameUseCaseImpl implements GetGameUseCase {
                 .id(gameEntity.getId())
                 .score(gameEntity.getScore())
                 .time(gameEntity.getTime())
-                .status(gameEntity.getStatus())  // Assuming status is being tracked
+                .status(gameEntity.getStatus())
+                .correctGuesses(gameEntity.getCorrectGuesses())
+                .wrongGuesses(gameEntity.getWrongGuesses())
                 .build();
     }
 }

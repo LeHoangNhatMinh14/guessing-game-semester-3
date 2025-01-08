@@ -32,7 +32,7 @@ public class DeleteWordFromThemeUseCaseImpl implements DeleteWordFromThemeUseCas
         }
 
         // Check if the word exists in the theme
-        if (!themeRepo.existsWordInTheme(id, word)) {
+        if (!themeRepo.existsByIdAndWordsContaining(id, word)) {
             throw new WordNotFoundException("Word not found in the theme.");
         }
 
@@ -47,3 +47,4 @@ public class DeleteWordFromThemeUseCaseImpl implements DeleteWordFromThemeUseCas
         themeRepo.save(themeEntity);
     }
 }
+

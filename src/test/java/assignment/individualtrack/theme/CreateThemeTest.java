@@ -5,6 +5,7 @@ import assignment.individualtrack.domain.Themes.CreateThemeRequest;
 import assignment.individualtrack.domain.Themes.CreateThemeResponse;
 import assignment.individualtrack.persistence.ThemeRepo;
 import assignment.individualtrack.persistence.entity.ThemeEntity;
+import assignment.individualtrack.persistence.entity.WordImage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -54,13 +55,13 @@ class CreateThemeTest {
         // Arrange
         CreateThemeRequest request = CreateThemeRequest.builder()
                 .themeName("Adventure")
-                .words(List.of("explore", "journey", "quest"))
+                .words(List.of(new WordImage("explore", null), new WordImage("journey", null), new WordImage("quest", null)))
                 .build();
 
         ThemeEntity savedTheme = ThemeEntity.builder()
                 .id(1L)
                 .name("Adventure")
-                .words(List.of("explore", "journey", "quest"))
+                .words(List.of(new WordImage("explore", null), new WordImage("journey", null), new WordImage("quest", null)))
                 .build();
 
         when(themeRepo.existsByName(request.getThemeName())).thenReturn(false);
@@ -74,4 +75,5 @@ class CreateThemeTest {
         verify(themeRepo, times(1)).existsByName(request.getThemeName());
         verify(themeRepo, times(1)).save(any(ThemeEntity.class));
     }
+
 }

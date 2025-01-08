@@ -16,3 +16,4 @@ public class Game {
     private long playerId;
     private GameStatus status;
 }
+

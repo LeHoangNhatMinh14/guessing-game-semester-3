@@ -9,8 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class GetAllWordsofThemeRequest {
-    private Long themeId;
-    private String themeName; // Optional field for theme name
+public class GetThemeStatisticsResponse {
+    private String themeName;
+    private long totalPlays;
 }
-

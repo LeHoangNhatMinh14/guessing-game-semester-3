@@ -26,6 +26,8 @@ public class GetPlayerGameHistoryUseCaseImpl implements GetPlayerGameHistoryUseC
                         .score(game.getScore())
                         .time(game.getTime())
                         .status(game.getStatus())
+                        .correctGuesses(game.getCorrectGuesses())
+                        .wrongGuesses(game.getWrongGuesses())
                         .build())
                 .collect(Collectors.toList());
 

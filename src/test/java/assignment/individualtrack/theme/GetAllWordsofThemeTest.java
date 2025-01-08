@@ -5,6 +5,7 @@ import assignment.individualtrack.domain.Themes.GetAllWordsofThemeRequest;
 import assignment.individualtrack.domain.Themes.GetAllWordsofThemesResponse;
 import assignment.individualtrack.persistence.ThemeRepo;
 import assignment.individualtrack.persistence.entity.ThemeEntity;
+import assignment.individualtrack.persistence.entity.WordImage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -33,16 +34,22 @@ class GetAllWordsofThemeTest {
     @Test
     void testGetAllWords_Success() {
         Long themeId = 1L;
-        ThemeEntity themeEntity = new ThemeEntity();
-        themeEntity.setWords(List.of("apple", "banana"));
+        ThemeEntity themeEntity = ThemeEntity.builder()
+                .id(themeId)
+                .words(List.of(
+                        new WordImage("apple", "banana-image-url"),
+                        new WordImage("banana", "banana-image-url")
+                ))
+                .build();
+
         when(themeRepo.findById(themeId)).thenReturn(Optional.of(themeEntity));
 
-        GetAllWordsofThemeRequest request = new GetAllWordsofThemeRequest(themeId);
+        GetAllWordsofThemeRequest request = new GetAllWordsofThemeRequest(themeId,null);
         GetAllWordsofThemesResponse response = getAllWordsofThemeUseCase.getAllWords(request);
 
         assertEquals(2, response.getWords().size());
-        assertEquals("apple", response.getWords().get(0));
-        assertEquals("banana", response.getWords().get(1));
+        assertEquals("apple", response.getWords().get(0).getWord());
+        assertEquals("banana", response.getWords().get(1).getWord());
     }
 
     @Test
@@ -50,7 +57,7 @@ class GetAllWordsofThemeTest {
         Long themeId = 1L;
         when(themeRepo.findById(themeId)).thenReturn(Optional.empty());
 
-        GetAllWordsofThemeRequest request = new GetAllWordsofThemeRequest(themeId);
+        GetAllWordsofThemeRequest request = new GetAllWordsofThemeRequest(themeId,null);
         GetAllWordsofThemesResponse response = getAllWordsofThemeUseCase.getAllWords(request);
 
         assertEquals(0, response.getWords().size());

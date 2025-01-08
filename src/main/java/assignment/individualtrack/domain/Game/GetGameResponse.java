@@ -11,4 +11,6 @@ public class GetGameResponse {
     private int time;
     private long playerId;
     private GameStatus status;
+    private int wrongGuesses;
+    private int correctGuesses;
 }

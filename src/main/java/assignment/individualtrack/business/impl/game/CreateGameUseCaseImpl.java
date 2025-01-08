@@ -6,43 +6,61 @@ import assignment.individualtrack.domain.Game.StartGameRequest;
 import assignment.individualtrack.domain.Game.StartGameResponse;
 import assignment.individualtrack.persistence.GameRepo;
 import assignment.individualtrack.persistence.PlayerRepo;
+import assignment.individualtrack.persistence.ThemeRepo;
 import assignment.individualtrack.persistence.entity.GameEntity;
 import assignment.individualtrack.persistence.entity.PlayerEntity;
+import assignment.individualtrack.persistence.entity.ThemeEntity;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 
 @Service
 @AllArgsConstructor
 public class CreateGameUseCaseImpl implements CreateGameUseCase {
     private final GameRepo gameRepo;
-    private final PlayerRepo playerRepo; // Inject the Player repository to fetch player entities
+    private final PlayerRepo playerRepo;
+    private final ThemeRepo themeRepo;
 
     @Override
     public StartGameResponse createGame(StartGameRequest startGameRequest) {
-        // Validate that playerID is not null
-        if (startGameRequest.getPlayerID() == null) {
-            throw new IllegalArgumentException("Player ID cannot be null");
+        // Validate player ID
+        if (startGameRequest.getPlayerID() == null || startGameRequest.getPlayerID() <= 0) {
+            throw new IllegalArgumentException("Invalid or missing player ID.");
         }
 
-        // Fetch the PlayerEntity by playerID
-        PlayerEntity player = playerRepo.findById(startGameRequest.getPlayerID())
+        // Validate theme ID
+        if (startGameRequest.getThemeID() == null || startGameRequest.getThemeID() <= 0) {
+            throw new IllegalArgumentException("Invalid or missing theme ID.");
+        }
+
+        // Fetch PlayerEntity and ThemeEntity
+        PlayerEntity playerEntity = playerRepo.findById(startGameRequest.getPlayerID())
                 .orElseThrow(() -> new IllegalArgumentException("Player not found with ID: " + startGameRequest.getPlayerID()));
 
-        // Create a new GameEntity and associate it with the fetched player
+        ThemeEntity themeEntity = themeRepo.findById(startGameRequest.getThemeID())
+                .orElseThrow(() -> new IllegalArgumentException("Theme not found with ID: " + startGameRequest.getThemeID()));
+
+        // Create and save new game entity
         GameEntity newGame = GameEntity.builder()
-                .player(player) // Associate with player entity
-                .score(0) // Initialize score to 0
-                .time(0)  // Initialize time to 0
-                .status(GameStatus.IN_PROGRESS) // Set the initial game status
+                .player(playerEntity)
+                .theme(themeEntity)
+                .score(0)
+                .time(0)
+                .correctGuesses(0)
+                .wrongGuesses(0)
+                .status(GameStatus.IN_PROGRESS)
+                .playedAt(LocalDateTime.now()) // Set the current time
                 .build();
 
-        // Save the new game to the database
         GameEntity savedGame = gameRepo.save(newGame);
 
-        // Return the response with gameId and playerId
+        // Build and return response
         return StartGameResponse.builder()
-                .gameId(savedGame.getId()) // Generated game ID from the database
-                .playerId(savedGame.getPlayer().getId()) // Player ID from the saved game
+                .gameId(savedGame.getId())
+                .playerId(savedGame.getPlayer().getId())
                 .build();
     }
 }
+
+

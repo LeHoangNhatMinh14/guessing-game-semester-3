@@ -5,7 +5,7 @@ import assignment.individualtrack.persistence.entity.ThemeEntity;
 import assignment.individualtrack.persistence.entity.WordImage;
 
 import java.util.ArrayList;
-import java.util.stream.Collectors;
+import java.util.List;
 
 final class ThemeConverter {
     private ThemeConverter() {
@@ -20,9 +20,7 @@ final class ThemeConverter {
                 .id(themeEntity.getId())
                 .name(themeEntity.getName())
                 .words(themeEntity.getWords() != null
-                        ? themeEntity.getWords().stream()
-                        .map(WordImage::getWord)
-                        .collect(Collectors.toList())
+                        ? new ArrayList<>(themeEntity.getWords()) // Direct mapping of WordImage objects
                         : new ArrayList<>())
                 .build();
     }
@@ -36,11 +34,8 @@ final class ThemeConverter {
                 .id(theme.getId())
                 .name(theme.getName())
                 .words(theme.getWords() != null
-                        ? theme.getWords().stream()
-                        .map(word -> new WordImage(word, null))
-                        .collect(Collectors.toList())
+                        ? new ArrayList<>(theme.getWords()) // Direct mapping of WordImage objects
                         : new ArrayList<>())
                 .build();
     }
-
 }

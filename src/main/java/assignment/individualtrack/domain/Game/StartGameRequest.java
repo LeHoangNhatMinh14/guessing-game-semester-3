@@ -11,4 +11,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class StartGameRequest {
     private Long playerID;
+    private Long themeID;
 }

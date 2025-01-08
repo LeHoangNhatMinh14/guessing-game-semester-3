@@ -1,5 +1,6 @@
 package assignment.individualtrack.domain.Themes;
 
+import assignment.individualtrack.persistence.entity.WordImage;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,5 +15,5 @@ import java.util.List;
 public class Theme {
     private Long id;
     private String name;
-    private List<String> words;
+    private List<WordImage> words;
 }

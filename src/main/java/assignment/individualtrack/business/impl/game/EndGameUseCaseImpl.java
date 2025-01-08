@@ -17,28 +17,36 @@ public class EndGameUseCaseImpl implements EndGameUseCase {
 
     @Override
     public EndGameResponse endGame(EndGameRequest endGameRequest) {
+        // Validate input
+        if (endGameRequest.getGameId() <= 0) {
+            throw new IllegalArgumentException("Invalid game ID.");
+        }
+
         GameEntity gameEntity = gameRepo.findById(endGameRequest.getGameId())
-                .orElseThrow(() -> new GameNotFoundException("Game not found"));
+                .orElseThrow(() -> new GameNotFoundException("Game not found with ID: " + endGameRequest.getGameId()));
 
         if (gameEntity.getStatus() == GameStatus.COMPLETED) {
             throw new IllegalStateException("Game has already been completed.");
         }
 
-        int score = (endGameRequest.getCorrectGuesses() - endGameRequest.getIncorrectGuesses());
-        gameEntity.setScore(score);
+        // Update game entity with request data
+        gameEntity.setCorrectGuesses(endGameRequest.getCorrectGuesses());
+        gameEntity.setWrongGuesses(endGameRequest.getIncorrectGuesses());
+        gameEntity.setScore(endGameRequest.getScore());
         gameEntity.setTime(endGameRequest.getTime());
-        gameEntity.setStatus(endGameRequest.getStatus());
+        gameEntity.setStatus(GameStatus.COMPLETED); // Finalize game status
 
-        // Save the updated game entity
-        gameRepo.save(gameEntity);
+        // Save updated game entity
+        GameEntity updatedGame = gameRepo.save(gameEntity);
 
-        // Build and return EndGameResponse
+        // Build and return response
         return EndGameResponse.builder()
-                .finalScore(gameEntity.getScore())
-                .timeTaken(gameEntity.getTime())
-                .correctGuesses(endGameRequest.getCorrectGuesses())
-                .incorrectGuesses(endGameRequest.getIncorrectGuesses())
+                .finalScore(updatedGame.getScore())
+                .timeTaken(updatedGame.getTime())
+                .correctGuesses(updatedGame.getCorrectGuesses())
+                .incorrectGuesses(updatedGame.getWrongGuesses())
                 .message("Game completed successfully!")
                 .build();
     }
 }
+

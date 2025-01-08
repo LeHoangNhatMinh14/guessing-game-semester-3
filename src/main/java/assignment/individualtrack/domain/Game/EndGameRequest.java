@@ -13,3 +13,4 @@ public class EndGameRequest {
     private int correctGuesses;
     private int incorrectGuesses;
 }
+

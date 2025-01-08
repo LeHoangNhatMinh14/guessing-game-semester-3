@@ -28,35 +28,45 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             String token = authorizationHeader.substring(7);
             try {
+                // Parse JWT token
                 Claims claims = Jwts.parserBuilder()
-                        .setSigningKey(SECRET_KEY) // Use the same secret key used for encoding
+                        .setSigningKey(SECRET_KEY) // Validate with the same secret key
                         .build()
                         .parseClaimsJws(token)
                         .getBody();
 
-                String username = claims.getSubject(); // Retrieve the subject (username)
-                String role = claims.get("role", String.class); // Retrieve the role claim
-                Long playerId = claims.get("id", Long.class); // Retrieve the player ID
+                // Extract claims
+                String username = claims.getSubject();
+                String role = claims.get("role", String.class);
+                Long playerId = claims.get("id", Long.class);
 
-                if (username != null && role != null && playerId != null) {
+                if (username != null && role != null && playerId != null &&
+                        SecurityContextHolder.getContext().getAuthentication() == null) {
+
+                    // Create authorities from role
                     List<org.springframework.security.core.GrantedAuthority> authorities = List.of(() -> role);
 
+                    // Set up authentication
                     UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                             username, null, authorities
                     );
                     authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-                    // Set the SecurityContext with authentication
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
 
             } catch (Exception e) {
+                // Clear the security context on JWT validation failure
                 SecurityContextHolder.clearContext();
-                // Log exception for better debugging
-                System.err.println("Failed to parse JWT: " + e.getMessage());
+
+                // Log the error for debugging purposes
+                System.err.println("Invalid JWT token: " + e.getMessage());
+
+                // Optionally send a 401 response (uncomment if needed)
+                // response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid JWT token");
             }
         }
 
+        // Continue the filter chain
         filterChain.doFilter(request, response);
     }
 }
