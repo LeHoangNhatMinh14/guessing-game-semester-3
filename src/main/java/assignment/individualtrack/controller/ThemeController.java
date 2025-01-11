@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import java.time.format.DateTimeParseException;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -115,24 +116,34 @@ public class ThemeController {
     }
 
     @GetMapping("/statistics")
-    public ResponseEntity<List<GetThemeStatisticsResponse>> getThemeStatistics(
+    public ResponseEntity<Object> getThemeStatistics(
             @RequestParam("startDate") String startDate,
             @RequestParam("endDate") String endDate) {
+        if (startDate == null || endDate == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Start date and end date must be provided.");
+        }
+
         try {
             LocalDateTime start = LocalDateTime.parse(startDate);
             LocalDateTime end = LocalDateTime.parse(endDate);
 
-            // Use the service implementation to fetch data
-            List<GetThemeStatisticsResponse> statistics = getThemeStatisticsUseCase.execute(start,end);
+            List<GetThemeStatisticsResponse> statistics = getThemeStatisticsUseCase.execute(start, end);
 
             if (statistics == null || statistics.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body("No theme statistics found for the specified date range.");
             }
+
             return ResponseEntity.ok(statistics);
+
+        } catch (DateTimeParseException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Invalid date format. Please use the correct ISO-8601 format, e.g., '2025-01-11T15:30:00'.");
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("An error occurred while fetching theme statistics. Please try again later.");
         }
     }
-
 }
 

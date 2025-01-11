@@ -16,6 +16,10 @@ public class GetThemeStatisticsUseCaseImpl implements GetThemeStatisticsUseCase 
 
     @Override
     public List<GetThemeStatisticsResponse> execute(LocalDateTime startDate, LocalDateTime endDate) {
-        return themeRepo.getThemeStatistics(startDate, endDate);
+        try {
+            return themeRepo.getThemeStatistics(startDate, endDate);
+        } catch (Exception e) {
+            throw new RuntimeException("An error occurred while fetching theme statistics.", e);
+        }
     }
 }

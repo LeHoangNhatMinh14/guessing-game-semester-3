@@ -12,4 +12,5 @@ import lombok.NoArgsConstructor;
 public class StartGameRequest {
     private Long playerID;
     private Long themeID;
+    private String themeName;
 }

@@ -20,6 +20,7 @@ public class GetAllThemesUseCaseImpl implements GetAllThemeUseCase {
 
     @Override
     public GetAllThemesResponse getAllThemes() {
+        // Fetch all themes from the database
         List<ThemeEntity> themeEntities = themeRepo.findAll();
 
         // Convert database themes to domain objects
@@ -27,9 +28,13 @@ public class GetAllThemesUseCaseImpl implements GetAllThemeUseCase {
                 .map(ThemeConverter::convert)
                 .collect(Collectors.toList());
 
-        // Add the dynamic "Pokemon" theme
-        List<WordImage> pokemonData = pokemonService.getPokemonData(100);
-        themes.add(new Theme(0L, "Pokemon",pokemonData)); // ID is null for dynamic themes
+        // Add words to the "Pokemon" theme dynamically
+        themes.forEach(theme -> {
+            if ("Pokemon".equalsIgnoreCase(theme.getName())) {
+                List<WordImage> pokemonData = pokemonService.getPokemonData(100); // Fetch Pokémon data dynamically
+                theme.setWords(pokemonData); // Set the dynamic words to the theme
+            }
+        });
 
         return new GetAllThemesResponse(themes);
     }

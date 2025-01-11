@@ -20,11 +20,10 @@ public class GetAllWordsofThemeUseCaseImpl implements GetAllWordsofThemUseCase {
 
     @Override
     public GetAllWordsofThemesResponse getAllWords(GetAllWordsofThemeRequest request) {
-        // Handle "Pokemon" theme dynamically
         if ("Pokemon".equalsIgnoreCase(request.getThemeName())) {
-            List<WordImage> pokemonData = pokemonService.getPokemonData(10); // Fetch data from the API
+            List<WordImage> pokemonData = pokemonService.getPokemonData(100); // Fetch data from the API
             return GetAllWordsofThemesResponse.builder()
-                    .themeId(null) // No database ID for dynamic themes
+                    .themeId(pokemonService.getPokemonThemeId()) // Static ID for tracking
                     .themeName("Pokemon")
                     .words(pokemonData)
                     .build();
@@ -48,5 +47,4 @@ public class GetAllWordsofThemeUseCaseImpl implements GetAllWordsofThemUseCase {
                 .words(List.of())
                 .build();
     }
-
 }

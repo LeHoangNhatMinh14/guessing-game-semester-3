@@ -15,6 +15,8 @@ import java.util.Map;
 public class PokemonService {
     private final RestTemplate restTemplate;
 
+    private static final Long POKEMON_THEME_ID = 1L; // Static ID for "Pokemon" theme
+
     public List<WordImage> getPokemonData(int limit) {
         String apiUrl = "https://pokeapi.co/api/v2/pokemon?limit=" + limit;
         ResponseEntity<Map> response = restTemplate.getForEntity(apiUrl, Map.class);
@@ -31,5 +33,8 @@ public class PokemonService {
         }
         return wordImages;
     }
-}
 
+    public Long getPokemonThemeId() {
+        return POKEMON_THEME_ID;
+    }
+}

@@ -4,5 +4,6 @@ public enum GameStatus {
     STARTED,
     IN_PROGRESS,
     COMPLETED,
-    ABANDONED
+    ABANDONED,
+    FAILED
 }

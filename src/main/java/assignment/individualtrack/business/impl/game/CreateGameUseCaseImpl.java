@@ -1,5 +1,6 @@
 package assignment.individualtrack.business.impl.game;
 
+import assignment.individualtrack.business.impl.themes.PokemonService;
 import assignment.individualtrack.business.intefaces.CreateGameUseCase;
 import assignment.individualtrack.domain.Game.GameStatus;
 import assignment.individualtrack.domain.Game.StartGameRequest;
@@ -21,6 +22,7 @@ public class CreateGameUseCaseImpl implements CreateGameUseCase {
     private final GameRepo gameRepo;
     private final PlayerRepo playerRepo;
     private final ThemeRepo themeRepo;
+    private final PokemonService pokemonService; // Injected service for handling dynamic themes
 
     @Override
     public StartGameResponse createGame(StartGameRequest startGameRequest) {
@@ -29,8 +31,15 @@ public class CreateGameUseCaseImpl implements CreateGameUseCase {
             throw new IllegalArgumentException("Invalid or missing player ID.");
         }
 
-        // Validate theme ID
-        if (startGameRequest.getThemeID() == null || startGameRequest.getThemeID() <= 0) {
+        // Validate theme ID or handle "Pokemon" theme dynamically
+        Long themeId;
+        if ("Pokemon".equalsIgnoreCase(startGameRequest.getThemeName())) {
+            themeId = pokemonService.getPokemonThemeId(); // Fetch the predefined ID for "Pokemon"
+        } else {
+            themeId = startGameRequest.getThemeID();
+        }
+
+        if (themeId == null || themeId < 0) {
             throw new IllegalArgumentException("Invalid or missing theme ID.");
         }
 
@@ -38,8 +47,8 @@ public class CreateGameUseCaseImpl implements CreateGameUseCase {
         PlayerEntity playerEntity = playerRepo.findById(startGameRequest.getPlayerID())
                 .orElseThrow(() -> new IllegalArgumentException("Player not found with ID: " + startGameRequest.getPlayerID()));
 
-        ThemeEntity themeEntity = themeRepo.findById(startGameRequest.getThemeID())
-                .orElseThrow(() -> new IllegalArgumentException("Theme not found with ID: " + startGameRequest.getThemeID()));
+        ThemeEntity themeEntity = themeRepo.findById(themeId)
+                .orElseThrow(() -> new IllegalArgumentException("Theme not found with ID: " + themeId));
 
         // Create and save new game entity
         GameEntity newGame = GameEntity.builder()
@@ -62,5 +71,3 @@ public class CreateGameUseCaseImpl implements CreateGameUseCase {
                 .build();
     }
 }
-
-

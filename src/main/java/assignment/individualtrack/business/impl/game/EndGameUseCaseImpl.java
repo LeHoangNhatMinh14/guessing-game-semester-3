@@ -18,7 +18,7 @@ public class EndGameUseCaseImpl implements EndGameUseCase {
     @Override
     public EndGameResponse endGame(EndGameRequest endGameRequest) {
         // Validate input
-        if (endGameRequest.getGameId() <= 0) {
+        if (endGameRequest.getGameId() < 0) {
             throw new IllegalArgumentException("Invalid game ID.");
         }
 
