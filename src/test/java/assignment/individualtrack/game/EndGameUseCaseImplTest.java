@@ -42,14 +42,16 @@ public class EndGameUseCaseImplTest {
         GameEntity gameEntity = new GameEntity();
         gameEntity.setId(1L);
         gameEntity.setStatus(GameStatus.IN_PROGRESS);
+        gameEntity.setScore(0);
 
         when(gameRepo.findById(1L)).thenReturn(Optional.of(gameEntity));
+        when(gameRepo.save(any(GameEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // Act
         EndGameResponse response = endGameUseCase.endGame(request);
 
         // Assert
-        assertEquals(3, response.getFinalScore());
+        assertEquals(3, response.getFinalScore()); // 5 correct - 2 incorrect = 3
         assertEquals(120, response.getTimeTaken());
         assertEquals(5, response.getCorrectGuesses());
         assertEquals(2, response.getIncorrectGuesses());

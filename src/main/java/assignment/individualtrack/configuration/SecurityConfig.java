@@ -42,18 +42,18 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Enable CORS
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/players/login", "/players/register").permitAll() // Allow login and registration
-                        .requestMatchers(HttpMethod.GET, "/themes", "/themes/**").permitAll() // Allow all themes and words-related requests
-                        .requestMatchers(HttpMethod.GET, "/themes", "/themes/{themeId}/words").permitAll() // Allow all users to view themes and words
+                        .requestMatchers(HttpMethod.GET, "/themes", "/themes/**").permitAll() // Allow unauthenticated access to themes
                         .requestMatchers(HttpMethod.POST, "/themes", "/themes/words").authenticated() // Require authentication for creating themes or adding words
-                        .requestMatchers(HttpMethod.PUT, "/themes/{themeId}/words").hasRole("ADMIN") // Require ADMIN role for deleting words from a theme
-                        .requestMatchers(HttpMethod.DELETE, "/themes/{themeId}").hasRole("ADMIN") // Require ADMIN role for deleting a theme
-                        .requestMatchers(HttpMethod.POST, "/games/startNew", "/games/end").authenticated() // Ensure games/startNew is protected
+                        .requestMatchers(HttpMethod.PUT, "/themes/{themeId}/words").hasRole("ADMIN") // Require ADMIN role for modifying themes
+                        .requestMatchers(HttpMethod.DELETE, "/themes/{themeId}").hasRole("ADMIN") // Require ADMIN role for deleting themes
+                        .requestMatchers(HttpMethod.POST, "/games/startNew", "/games/end").authenticated() // Protect game state operations
                         .anyRequest().authenticated() // All other requests require authentication
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
+
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {

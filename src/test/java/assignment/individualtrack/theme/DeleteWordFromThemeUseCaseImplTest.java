@@ -57,6 +57,8 @@ class DeleteWordFromThemeUseCaseImplTest {
         verify(themeRepo, times(1)).existsByIdAndWordsContaining(themeId, wordToDelete);
         verify(themeRepo, times(1)).findById(themeId);
         verify(themeRepo, times(1)).save(themeEntity);
+
+        // Assert the word was removed
         assertFalse(themeEntity.getWords().stream()
                 .anyMatch(word -> word.getWord().equals(wordToDelete)));
     }
@@ -88,7 +90,8 @@ class DeleteWordFromThemeUseCaseImplTest {
         when(themeRepo.existsByIdAndWordsContaining(themeId, wordToDelete)).thenReturn(false);
 
         // Act & Assert
-        WordNotFoundException exception = assertThrows(WordNotFoundException.class, () -> deleteWordFromThemeUseCase.deleteWord(wordToDelete, themeId));
+        WordNotFoundException exception = assertThrows(WordNotFoundException.class, () ->
+                deleteWordFromThemeUseCase.deleteWord(wordToDelete, themeId));
         assertEquals("Word not found in the theme.", exception.getMessage());
         verify(themeRepo, times(1)).existsById(themeId);
         verify(themeRepo, times(1)).existsByIdAndWordsContaining(themeId, wordToDelete);

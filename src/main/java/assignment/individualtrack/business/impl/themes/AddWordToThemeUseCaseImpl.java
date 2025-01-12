@@ -61,6 +61,10 @@ public class AddWordToThemeUseCaseImpl implements AddWordToThemeUseCase {
             }
         }
 
+        if (theme.getWords() == null) {
+            theme.setWords(new ArrayList<>());
+        }
+
         // Save the word and image URL
         WordImage newWordImage = new WordImage(newWord, imageUrl);
         theme.getWords().add(newWordImage);

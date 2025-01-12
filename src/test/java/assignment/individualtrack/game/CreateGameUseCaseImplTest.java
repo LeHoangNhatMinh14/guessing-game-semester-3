@@ -6,8 +6,10 @@ import assignment.individualtrack.domain.Game.StartGameRequest;
 import assignment.individualtrack.domain.Game.StartGameResponse;
 import assignment.individualtrack.persistence.GameRepo;
 import assignment.individualtrack.persistence.PlayerRepo;
+import assignment.individualtrack.persistence.ThemeRepo;
 import assignment.individualtrack.persistence.entity.GameEntity;
 import assignment.individualtrack.persistence.entity.PlayerEntity;
+import assignment.individualtrack.persistence.entity.ThemeEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -28,6 +30,9 @@ class CreateGameUseCaseImplTest {
     @Mock
     private PlayerRepo playerRepo;
 
+    @Mock
+    private ThemeRepo themeRepo;
+
     @InjectMocks
     private CreateGameUseCaseImpl createGameUseCase;
 
@@ -40,20 +45,27 @@ class CreateGameUseCaseImplTest {
     void createGame_happyPath_shouldCreateGameSuccessfully() {
         // Arrange
         Long playerId = 1L;
+        Long themeId = 2L; // Valid theme ID
         PlayerEntity playerEntity = new PlayerEntity();
         playerEntity.setId(playerId);
 
+        ThemeEntity themeEntity = new ThemeEntity();
+        themeEntity.setId(themeId);
+
         StartGameRequest request = StartGameRequest.builder()
                 .playerID(playerId)
+                .themeID(themeId) // Provide valid theme ID
                 .build();
 
         when(playerRepo.findById(playerId)).thenReturn(Optional.of(playerEntity));
+        when(themeRepo.findById(themeId)).thenReturn(Optional.of(themeEntity));
 
         ArgumentCaptor<GameEntity> gameEntityCaptor = ArgumentCaptor.forClass(GameEntity.class);
 
         GameEntity savedGameEntity = GameEntity.builder()
                 .id(10L)
                 .player(playerEntity)
+                .theme(themeEntity) // Associate theme entity
                 .score(0)
                 .time(0)
                 .status(GameStatus.IN_PROGRESS)
@@ -70,10 +82,12 @@ class CreateGameUseCaseImplTest {
         assertEquals(playerId, response.getPlayerId());
 
         verify(playerRepo).findById(playerId);
+        verify(themeRepo).findById(themeId);
         verify(gameRepo).save(gameEntityCaptor.capture());
 
         GameEntity capturedGameEntity = gameEntityCaptor.getValue();
         assertEquals(playerEntity, capturedGameEntity.getPlayer());
+        assertEquals(themeEntity, capturedGameEntity.getTheme()); // Verify theme
         assertEquals(0, capturedGameEntity.getScore());
         assertEquals(0, capturedGameEntity.getTime());
         assertEquals(GameStatus.IN_PROGRESS, capturedGameEntity.getStatus());
@@ -88,7 +102,7 @@ class CreateGameUseCaseImplTest {
 
         // Act & Assert
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> createGameUseCase.createGame(request));
-        assertEquals("Player ID cannot be null", exception.getMessage());
+        assertEquals("Invalid or missing player ID.", exception.getMessage());
 
         verifyNoInteractions(playerRepo);
         verifyNoInteractions(gameRepo);
@@ -98,11 +112,14 @@ class CreateGameUseCaseImplTest {
     void createGame_playerNotFound_shouldThrowException() {
         // Arrange
         Long playerId = 1L;
+        Long themeId = 2L; // Valid theme ID
         StartGameRequest request = StartGameRequest.builder()
                 .playerID(playerId)
+                .themeID(themeId)
                 .build();
 
         when(playerRepo.findById(playerId)).thenReturn(Optional.empty());
+        when(themeRepo.findById(themeId)).thenReturn(Optional.of(new ThemeEntity())); // Mock valid theme
 
         // Act & Assert
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> createGameUseCase.createGame(request));
@@ -111,4 +128,5 @@ class CreateGameUseCaseImplTest {
         verify(playerRepo).findById(playerId);
         verifyNoInteractions(gameRepo);
     }
+
 }

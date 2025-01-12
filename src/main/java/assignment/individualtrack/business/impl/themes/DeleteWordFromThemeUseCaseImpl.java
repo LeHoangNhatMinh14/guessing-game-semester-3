@@ -15,33 +15,27 @@ public class DeleteWordFromThemeUseCaseImpl implements DeleteWordFromThemeUseCas
     private final ThemeRepo themeRepo;
 
     @Override
-    public void deleteWord(String word, Long id) {
-        // Validate theme ID
-        if (id == null) {
+    public void deleteWord(String word, Long themeId) {
+        if (themeId == null) {
             throw new ThemeNotFoundException("Theme ID cannot be null.");
         }
 
         // Check if theme exists
-        if (!themeRepo.existsById(id)) {
-            throw new ThemeNotFoundException("Theme not found with ID: " + id);
-        }
-
-        // Validate word
-        if (word == null || word.trim().isEmpty()) {
-            throw new WordNotFoundException("Word cannot be null or empty.");
+        if (!themeRepo.existsById(themeId)) {
+            throw new ThemeNotFoundException("Theme not found with ID: " + themeId);
         }
 
         // Check if the word exists in the theme
-        if (!themeRepo.existsByIdAndWordsContaining(id, word)) {
+        if (!themeRepo.existsByIdAndWordsContaining(themeId, word)) {
             throw new WordNotFoundException("Word not found in the theme.");
         }
 
         // Fetch the theme entity
-        ThemeEntity themeEntity = themeRepo.findById(id)
-                .orElseThrow(() -> new ThemeNotFoundException("Theme not found with ID: " + id));
+        ThemeEntity themeEntity = themeRepo.findById(themeId)
+                .orElseThrow(() -> new ThemeNotFoundException("Theme not found with ID: " + themeId));
 
         // Remove the word from the theme's word list
-        themeEntity.getWords().remove(word);
+        themeEntity.getWords().removeIf(wordImage -> wordImage.getWord().equals(word));
 
         // Save the updated theme entity back to the repository
         themeRepo.save(themeEntity);

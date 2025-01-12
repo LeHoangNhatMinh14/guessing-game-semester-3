@@ -16,30 +16,27 @@ public class EndGameUseCaseImpl implements EndGameUseCase {
     private final GameRepo gameRepo;
 
     @Override
-    public EndGameResponse endGame(EndGameRequest endGameRequest) {
-        // Validate input
-        if (endGameRequest.getGameId() < 0) {
-            throw new IllegalArgumentException("Invalid game ID.");
-        }
+    public EndGameResponse endGame(EndGameRequest request) {
+        // Fetch the game entity
+        GameEntity gameEntity = gameRepo.findById(request.getGameId())
+                .orElseThrow(() -> new GameNotFoundException("Game not found with ID: " + request.getGameId()));
 
-        GameEntity gameEntity = gameRepo.findById(endGameRequest.getGameId())
-                .orElseThrow(() -> new GameNotFoundException("Game not found with ID: " + endGameRequest.getGameId()));
-
+        // Validate game status
         if (gameEntity.getStatus() == GameStatus.COMPLETED) {
-            throw new IllegalStateException("Game has already been completed.");
+            throw new IllegalStateException("Game is already completed.");
         }
 
-        // Update game entity with request data
-        gameEntity.setCorrectGuesses(endGameRequest.getCorrectGuesses());
-        gameEntity.setWrongGuesses(endGameRequest.getIncorrectGuesses());
-        gameEntity.setScore(endGameRequest.getScore());
-        gameEntity.setTime(endGameRequest.getTime());
-        gameEntity.setStatus(GameStatus.COMPLETED); // Finalize game status
+        // Update game entity with new data
+        gameEntity.setCorrectGuesses(request.getCorrectGuesses());
+        gameEntity.setWrongGuesses(request.getIncorrectGuesses());
+        gameEntity.setTime(request.getTime());
+        gameEntity.setScore(request.getCorrectGuesses() - request.getIncorrectGuesses()); // Update score
+        gameEntity.setStatus(request.getStatus());
 
         // Save updated game entity
         GameEntity updatedGame = gameRepo.save(gameEntity);
 
-        // Build and return response
+        // Build and return the response
         return EndGameResponse.builder()
                 .finalScore(updatedGame.getScore())
                 .timeTaken(updatedGame.getTime())

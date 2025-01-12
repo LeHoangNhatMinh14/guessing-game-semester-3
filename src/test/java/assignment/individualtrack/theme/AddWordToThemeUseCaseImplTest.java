@@ -78,9 +78,10 @@ class AddWordToThemeUseCaseImplTest {
                 .themeId(1L)
                 .word("NewWord")
                 .build();
+
         ThemeEntity theme = ThemeEntity.builder()
                 .id(1L)
-                .words(null)
+                .words(null) // Simulate null words list
                 .build();
 
         when(themeRepo.findById(request.getThemeId())).thenReturn(Optional.of(theme));
@@ -92,8 +93,12 @@ class AddWordToThemeUseCaseImplTest {
         // Assert
         assertNotNull(response);
         assertEquals(1L, response.getThemeId());
-        assertNotNull(theme.getWords());
-        assertTrue(theme.getWords().contains("NewWord"));
+        assertNotNull(theme.getWords()); // Verify the list is initialized
+
+        // Verify the word is added (as a WordImage object)
+        assertTrue(theme.getWords().stream()
+                .anyMatch(wordImage -> "NewWord".equals(wordImage.getWord())));
+
         verify(themeRepo, times(1)).findById(request.getThemeId());
         verify(themeRepo, times(1)).save(theme);
     }

@@ -10,10 +10,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import java.time.format.DateTimeParseException;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 
 @RestController
@@ -22,8 +22,8 @@ import java.util.List;
 public class ThemeController {
 
     private final AddWordToThemeUseCase addWordToThemeUseCase;
-    private final CreateThemeUseCase addThemeUseCase;
-    private final GetAllWordsofThemUseCase getAllWordsofThemUseCase;
+    private final CreateThemeUseCase createThemeUseCase;
+    private final GetAllWordsofThemUseCase getAllWordsOfThemeUseCase;
     private final GetAllThemeUseCase getAllThemesUseCase;
     private final DeleteThemeUseCase deleteThemeUseCase;
     private final DeleteWordFromThemeUseCase deleteWordFromThemeUseCase;
@@ -36,14 +36,7 @@ public class ThemeController {
             @RequestParam("word") String word,
             @RequestPart(value = "image", required = false) MultipartFile image) {
         try {
-            byte[] imageBytes = null;
-            if (image != null) {
-                try {
-                    imageBytes = image.getBytes();
-                } catch (IOException e) {
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to read image file.");
-                }
-            }
+            byte[] imageBytes = (image != null) ? image.getBytes() : null;
 
             AddWordToThemeRequest request = AddWordToThemeRequest.builder()
                     .themeId(themeId)
@@ -52,36 +45,35 @@ public class ThemeController {
                     .build();
 
             addWordToThemeUseCase.addwordtoTheme(request);
+            return ResponseEntity.ok("Word added to theme.");
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to process image file.");
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
-        return ResponseEntity.ok("Word added to theme.");
     }
-
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping
     public ResponseEntity<String> createTheme(@RequestBody CreateThemeRequest request) {
-        String themeName = request.getThemeName();
-        if (themeName == null || themeName.isEmpty()) {
-            return ResponseEntity.badRequest().body("Theme name cannot be empty");
+        if (request.getThemeName() == null || request.getThemeName().trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("Theme name cannot be empty.");
         }
-        addThemeUseCase.createTheme(request);
-        return ResponseEntity.ok("Theme created");
+        createThemeUseCase.createTheme(request);
+        return ResponseEntity.ok("Theme created.");
     }
 
     @GetMapping("/{themeId}/words")
-    public ResponseEntity<GetAllWordsofThemesResponse> getThemes(
+    public ResponseEntity<GetAllWordsofThemesResponse> getWordsOfTheme(
             @PathVariable Long themeId,
             @RequestParam(required = false) String name) {
 
         GetAllWordsofThemeRequest request = new GetAllWordsofThemeRequest(themeId, name);
-        GetAllWordsofThemesResponse response = getAllWordsofThemUseCase.getAllWords(request);
+        GetAllWordsofThemesResponse response = getAllWordsOfThemeUseCase.getAllWords(request);
 
         if (response == null || response.getWords().isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-
         return ResponseEntity.ok(response);
     }
 
@@ -109,10 +101,10 @@ public class ThemeController {
         }
         try {
             deleteWordFromThemeUseCase.deleteWord(word.trim(), themeId);
+            return ResponseEntity.ok("Word deleted from theme.");
         } catch (ThemeNotFoundException | WordNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
-        return ResponseEntity.ok("Word deleted from theme.");
     }
 
     @GetMapping("/statistics")
@@ -120,8 +112,7 @@ public class ThemeController {
             @RequestParam("startDate") String startDate,
             @RequestParam("endDate") String endDate) {
         if (startDate == null || endDate == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Start date and end date must be provided.");
+            return ResponseEntity.badRequest().body("Start date and end date must be provided.");
         }
 
         try {
@@ -131,19 +122,13 @@ public class ThemeController {
             List<GetThemeStatisticsResponse> statistics = getThemeStatisticsUseCase.execute(start, end);
 
             if (statistics == null || statistics.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body("No theme statistics found for the specified date range.");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No theme statistics found for the specified date range.");
             }
-
             return ResponseEntity.ok(statistics);
-
         } catch (DateTimeParseException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Invalid date format. Please use the correct ISO-8601 format, e.g., '2025-01-11T15:30:00'.");
+            return ResponseEntity.badRequest().body("Invalid date format. Use ISO-8601 format, e.g., '2025-01-11T15:30:00'.");
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("An error occurred while fetching theme statistics. Please try again later.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while fetching statistics.");
         }
     }
 }
-

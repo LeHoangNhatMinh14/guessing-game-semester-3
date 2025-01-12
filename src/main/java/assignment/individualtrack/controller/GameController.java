@@ -5,6 +5,7 @@ import assignment.individualtrack.business.intefaces.EndGameUseCase;
 import assignment.individualtrack.business.intefaces.GetGameUseCase;
 import assignment.individualtrack.business.intefaces.GetPlayerGameHistoryUseCase;
 import assignment.individualtrack.domain.Game.*;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,11 +22,14 @@ public class GameController {
 
     // Endpoint to start a new game
     @PostMapping("/startNew")
-    public ResponseEntity<StartGameResponse> startGame(@RequestBody StartGameRequest startGameRequest) {
-        System.out.println("Received player ID: " + startGameRequest.getPlayerID());
+    public ResponseEntity<StartGameResponse> startGame(@Valid @RequestBody StartGameRequest startGameRequest) {
+        if (startGameRequest.getPlayerID() == null || startGameRequest.getPlayerID() <= 0) {
+            return ResponseEntity.badRequest().body(null); // Return 400 Bad Request
+        }
         StartGameResponse response = createGameUseCase.createGame(startGameRequest);
         return ResponseEntity.ok(response);
     }
+
 
     // Endpoint to end the game and save the result
     @PostMapping("/end")
