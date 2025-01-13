@@ -6,6 +6,7 @@ variables:
   GIT_DEPTH: "0"  # Fetch all branches
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
   SONAR_HOST_URL: "http://localhost:9000"  # Set your SonarQube server URL here
+  SONAR_COVERAGE_PATH: "build/reports/jacoco/test/jacocoTestReport.xml"  # Jacoco coverage report path
 
 stages:
   - build
@@ -32,8 +33,10 @@ test-job1:
 sonarqube-check:
   stage: sonarqube-check
   script:
-    - ./gradlew clean build
-    - ./gradlew sonar
+    # Clean, build, and generate Jacoco report
+    - ./gradlew clean build jacocoTestReport
+    # Run SonarQube analysis with coverage path
+    - ./gradlew sonar -Dsonar.coverage.jacoco.xmlReportPaths=$SONAR_COVERAGE_PATH
   allow_failure: true
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
