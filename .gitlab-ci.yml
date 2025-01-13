@@ -1,35 +1,34 @@
 # Base image with Gradle 8.2 and JDK 17
 image: gradle:8.2.0-jdk17-jammy
 
-# Define environment variables
 variables:
   SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  # Location of the analysis task cache
   GIT_DEPTH: "0"  # Fetch all branches
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
   SONAR_HOST_URL: "http://localhost:9000"  # Set your SonarQube server URL here
 
-# Define stages
 stages:
   - build
   - test
   - sonarqube-check
   - deploy
 
-# Build job
+before_script:
+  # Mark the Git directory as safe
+  - git config --global --add safe.directory $CI_PROJECT_DIR
+
 build-job:
   stage: build
   script:
     - echo "Hello, $GITLAB_USER_LOGIN!"
     - ./gradlew assemble
 
-# Test jobs
 test-job1:
   stage: test
   script:
     - echo "This job tests something"
     - ./gradlew test
 
-# SonarQube analysis job
 sonarqube-check:
   stage: sonarqube-check
   script:
@@ -42,7 +41,6 @@ sonarqube-check:
     - if: $CI_COMMIT_BRANCH == 'main'
     - if: $CI_COMMIT_BRANCH == 'develop'
 
-# Deploy job
 deploy-prod:
   stage: deploy
   script:
