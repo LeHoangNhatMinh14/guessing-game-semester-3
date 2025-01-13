@@ -1,6 +1,6 @@
-package assignment.individualtrack.business.impl.player;
+package assignment.individualtrack.player;
 
-import assignment.individualtrack.business.intefaces.CreatePlayerUseCase;
+import assignment.individualtrack.business.impl.player.CreatePlayerUseCaseImpl;
 import assignment.individualtrack.domain.Player.CreatePlayerRequest;
 import assignment.individualtrack.domain.Player.CreatePlayerResponse;
 import assignment.individualtrack.persistence.PlayerRepo;
@@ -86,7 +86,7 @@ class CreatePlayerUseCaseImplTest {
         // Arrange
         CreatePlayerRequest request = CreatePlayerRequest.builder()
                 .name("NewPlayer")
-                .password("123")
+                .password("123") // Too short password
                 .build();
 
         // Act & Assert
@@ -101,6 +101,36 @@ class CreatePlayerUseCaseImplTest {
         // Act & Assert
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> createPlayerUseCase.createPlayer(null));
         assertEquals("Player request cannot be null", exception.getMessage());
+        verify(playerRepo, never()).existsByName(any());
+        verify(playerRepo, never()).save(any(PlayerEntity.class));
+    }
+
+    @Test
+    void createPlayer_blankPassword() {
+        // Arrange
+        CreatePlayerRequest request = CreatePlayerRequest.builder()
+                .name("NewPlayer")
+                .password("") // Blank password
+                .build();
+
+        // Act & Assert
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> createPlayerUseCase.createPlayer(request));
+        assertEquals("Password cannot be null or empty", exception.getMessage());
+        verify(playerRepo, never()).existsByName(any());
+        verify(playerRepo, never()).save(any(PlayerEntity.class));
+    }
+
+    @Test
+    void createPlayer_blankName() {
+        // Arrange
+        CreatePlayerRequest request = CreatePlayerRequest.builder()
+                .name("") // Blank name
+                .password("password123")
+                .build();
+
+        // Act & Assert
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> createPlayerUseCase.createPlayer(request));
+        assertEquals("Player name cannot be null or empty", exception.getMessage());
         verify(playerRepo, never()).existsByName(any());
         verify(playerRepo, never()).save(any(PlayerEntity.class));
     }
