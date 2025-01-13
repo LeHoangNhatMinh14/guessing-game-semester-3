@@ -39,8 +39,8 @@ class PokemonServiceTest {
 
         mockMainApiCall(apiUrl);
 
-        mockPokemonDetails("https://pokeapi.co/api/v2/pokemon/25", "pikachu", "https://pikachu-image-url.com");
-        mockPokemonDetails("https://pokeapi.co/api/v2/pokemon/1", "bulbasaur", "https://bulbasaur-image-url.com");
+        mockPokemonDetails("https://pokeapi.co/api/v2/pokemon/25", "https://pikachu-image-url.com");
+        mockPokemonDetails("https://pokeapi.co/api/v2/pokemon/1", "https://bulbasaur-image-url.com");
 
         // Act
         List<WordImage> wordImages = pokemonService.getPokemonData(limit);
@@ -101,7 +101,7 @@ class PokemonServiceTest {
         when(restTemplate.getForEntity(apiUrl, Map.class)).thenReturn(ResponseEntity.ok(mainResponse));
     }
 
-    private void mockPokemonDetails(String url, String name, String imageUrl) {
+    private void mockPokemonDetails(String url, String imageUrl) {
         Map<String, Object> sprites = new HashMap<>();
         sprites.put("front_default", imageUrl);
 
