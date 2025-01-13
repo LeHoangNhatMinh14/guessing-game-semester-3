@@ -37,7 +37,7 @@ class PokemonServiceTest {
         int limit = 2;
         String apiUrl = "https://pokeapi.co/api/v2/pokemon?limit=" + limit;
 
-        mockMainApiCall(apiUrl, limit);
+        mockMainApiCall(apiUrl);
 
         mockPokemonDetails("https://pokeapi.co/api/v2/pokemon/25", "pikachu", "https://pikachu-image-url.com");
         mockPokemonDetails("https://pokeapi.co/api/v2/pokemon/1", "bulbasaur", "https://bulbasaur-image-url.com");
@@ -86,7 +86,7 @@ class PokemonServiceTest {
         assertEquals(1L, themeId);
     }
 
-    private void mockMainApiCall(String apiUrl, int limit) {
+    private void mockMainApiCall(String apiUrl) {
         Map<String, Object> pokemon1 = new HashMap<>();
         pokemon1.put("name", "pikachu");
         pokemon1.put("url", "https://pokeapi.co/api/v2/pokemon/25");
