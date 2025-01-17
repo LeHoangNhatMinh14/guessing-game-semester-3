@@ -8,10 +8,15 @@ import assignment.individualtrack.persistence.Role;
 import assignment.individualtrack.persistence.entity.PlayerEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -81,43 +86,36 @@ class CreatePlayerUseCaseImplTest {
         verify(playerRepo, never()).save(any(PlayerEntity.class));
     }
 
-    @Test
-    void createPlayer_passwordTooShort() {
-        // Arrange
-        CreatePlayerRequest request = CreatePlayerRequest.builder()
-                .name("NewPlayer")
-                .password("123") // Too short password
-                .build();
-
+    @ParameterizedTest
+    @MethodSource("invalidPlayerRequests")
+    void createPlayer_invalidRequest_shouldThrowException(CreatePlayerRequest request, String expectedMessage) {
         // Act & Assert
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> createPlayerUseCase.createPlayer(request));
-        assertEquals("Password must be at least 6 characters", exception.getMessage());
-        verify(playerRepo, never()).existsByName(any());
-        verify(playerRepo, never()).save(any(PlayerEntity.class));
+        assertEquals(expectedMessage, exception.getMessage());
+
+        // Verify that no interactions happened with the repository
+        verifyNoInteractions(playerRepo);
     }
 
-    @Test
-    void createPlayer_nullRequest() {
-        // Act & Assert
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> createPlayerUseCase.createPlayer(null));
-        assertEquals("Player request cannot be null", exception.getMessage());
-        verify(playerRepo, never()).existsByName(any());
-        verify(playerRepo, never()).save(any(PlayerEntity.class));
-    }
-
-    @Test
-    void createPlayer_blankPassword() {
-        // Arrange
-        CreatePlayerRequest request = CreatePlayerRequest.builder()
-                .name("NewPlayer")
-                .password("") // Blank password
-                .build();
-
-        // Act & Assert
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> createPlayerUseCase.createPlayer(request));
-        assertEquals("Password cannot be null or empty", exception.getMessage());
-        verify(playerRepo, never()).existsByName(any());
-        verify(playerRepo, never()).save(any(PlayerEntity.class));
+    static Stream<Arguments> invalidPlayerRequests() {
+        return Stream.of(
+                org.junit.jupiter.params.provider.Arguments.of(
+                        CreatePlayerRequest.builder().name("NewPlayer").password("123").build(),
+                        "Password must be at least 6 characters"
+                ),
+                org.junit.jupiter.params.provider.Arguments.of(
+                        CreatePlayerRequest.builder().name("").password("password123").build(),
+                        "Player name cannot be null or empty"
+                ),
+                org.junit.jupiter.params.provider.Arguments.of(
+                        CreatePlayerRequest.builder().name("NewPlayer").password("").build(),
+                        "Password cannot be null or empty"
+                ),
+                org.junit.jupiter.params.provider.Arguments.of(
+                        null,
+                        "Player request cannot be null"
+                )
+        );
     }
 
     @Test

@@ -23,7 +23,7 @@ public class ThemeEntity {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "theme_words", joinColumns = @JoinColumn(name = "theme_id"))
     private List<WordImage> words; // Now refers to WordImage instead of String
 }

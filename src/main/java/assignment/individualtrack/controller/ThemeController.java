@@ -8,13 +8,15 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/themes")
@@ -28,6 +30,8 @@ public class ThemeController {
     private final DeleteThemeUseCase deleteThemeUseCase;
     private final DeleteWordFromThemeUseCase deleteWordFromThemeUseCase;
     private final GetThemeStatisticsUseCase getThemeStatisticsUseCase;
+    private final SearchThemeUseCase searchThemeUseCase;
+    private static final Logger log = LoggerFactory.getLogger(ThemeController.class);
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping(value = "/words", consumes = "multipart/form-data")
@@ -81,7 +85,7 @@ public class ThemeController {
     public ResponseEntity<GetAllThemesResponse> getAllThemes() {
         GetAllThemesResponse response = getAllThemesUseCase.getAllThemes();
         if (response == null || response.getThemes().isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
         return ResponseEntity.ok(response);
     }
@@ -108,27 +112,31 @@ public class ThemeController {
     }
 
     @GetMapping("/statistics")
-    public ResponseEntity<Object> getThemeStatistics(
-            @RequestParam("startDate") String startDate,
-            @RequestParam("endDate") String endDate) {
-        if (startDate == null || endDate == null) {
-            return ResponseEntity.badRequest().body("Start date and end date must be provided.");
-        }
-
+    public ResponseEntity<List<GetThemeStatisticsResponse>> getStatistics(
+            @RequestParam Optional<Integer> year,
+            @RequestParam Optional<Integer> month,
+            @RequestParam Optional<Integer> week) {
         try {
-            LocalDateTime start = LocalDateTime.parse(startDate);
-            LocalDateTime end = LocalDateTime.parse(endDate);
 
-            List<GetThemeStatisticsResponse> statistics = getThemeStatisticsUseCase.execute(start, end);
-
-            if (statistics == null || statistics.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No theme statistics found for the specified date range.");
-            }
+            List<GetThemeStatisticsResponse> statistics = getThemeStatisticsUseCase.execute(year, month, week);
             return ResponseEntity.ok(statistics);
-        } catch (DateTimeParseException e) {
-            return ResponseEntity.badRequest().body("Invalid date format. Use ISO-8601 format, e.g., '2025-01-11T15:30:00'.");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while fetching statistics.");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<SearchThemeResponse> searchThemes(@RequestParam String term, Authentication authentication) {
+        log.debug("Authenticated user: {}", authentication.getName());
+        log.debug("User roles: {}", authentication.getAuthorities());
+
+        SearchThemeRequest request = new SearchThemeRequest(term);
+        SearchThemeResponse response = searchThemeUseCase.searchThemes(request);
+
+        if (response == null || response.getThemes().isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        return ResponseEntity.ok(response);
+    }
+
 }

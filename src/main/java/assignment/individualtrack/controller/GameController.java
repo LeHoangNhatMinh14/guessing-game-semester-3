@@ -1,9 +1,6 @@
 package assignment.individualtrack.controller;
 
-import assignment.individualtrack.business.intefaces.CreateGameUseCase;
-import assignment.individualtrack.business.intefaces.EndGameUseCase;
-import assignment.individualtrack.business.intefaces.GetGameUseCase;
-import assignment.individualtrack.business.intefaces.GetPlayerGameHistoryUseCase;
+import assignment.individualtrack.business.intefaces.*;
 import assignment.individualtrack.domain.Game.*;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;

@@ -12,7 +12,6 @@ import assignment.individualtrack.persistence.entity.WordImage;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Optional;
 
@@ -54,15 +53,7 @@ public class AddWordToThemeUseCaseImpl implements AddWordToThemeUseCase {
         // Upload the image to Imgur and get the URL
         String imageUrl = null;
         if (request.getImage() != null && request.getImage().length > 0) {
-            try {
-                imageUrl = imgurService.uploadImage(request.getImage()); // Imgur upload
-            } catch (IOException e) {
-                throw new RuntimeException("Failed to upload image to Imgur", e);
-            }
-        }
-
-        if (theme.getWords() == null) {
-            theme.setWords(new ArrayList<>());
+            imageUrl = imgurService.upload(request.getImage()); // Imgur upload
         }
 
         // Save the word and image URL
@@ -78,6 +69,7 @@ public class AddWordToThemeUseCaseImpl implements AddWordToThemeUseCase {
                 .build();
     }
 }
+
 
 
 

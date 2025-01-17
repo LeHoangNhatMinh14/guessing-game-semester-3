@@ -28,6 +28,7 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/myproject
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: Fangster123!
+      IMGUR_CLIENT_ID: fe633d47d0ce304
     ports:
       - "8080:8080"
     depends_on:
@@ -36,11 +37,11 @@ services:
     networks:
       - my-network
     volumes:
-      - gradle-cache:/home/gradle/.gradle # Cache Gradle dependencies
+      - gradle-cache:/home/gradle/.gradle
 
 volumes:
   db-data:
-  gradle-cache: # For Gradle caching
+  gradle-cache:
 
 networks:
   my-network:

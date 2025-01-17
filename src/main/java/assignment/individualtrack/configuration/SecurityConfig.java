@@ -47,6 +47,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/themes/{themeId}/words").hasRole("ADMIN") // Require ADMIN role for modifying themes
                         .requestMatchers(HttpMethod.DELETE, "/themes/{themeId}").hasRole("ADMIN") // Require ADMIN role for deleting themes
                         .requestMatchers(HttpMethod.POST, "/games/startNew", "/games/end").authenticated() // Protect game state operations
+                        .requestMatchers(HttpMethod.GET, "/themes/search").permitAll() // Protect game state operation
+                        .requestMatchers(HttpMethod.POST, "games/filter").authenticated()
                         .anyRequest().authenticated() // All other requests require authentication
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);

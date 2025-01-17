@@ -2,9 +2,9 @@ package assignment.individualtrack.business.intefaces;
 
 import assignment.individualtrack.domain.Themes.GetThemeStatisticsResponse;
 
-import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface GetThemeStatisticsUseCase {
-    List<GetThemeStatisticsResponse> execute(LocalDateTime startDate, LocalDateTime endDate);
+    List<GetThemeStatisticsResponse> execute(Optional<Integer> year, Optional<Integer> month, Optional<Integer> week);
 }

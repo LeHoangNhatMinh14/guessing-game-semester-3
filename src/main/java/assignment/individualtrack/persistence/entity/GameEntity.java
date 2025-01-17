@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDateTime;
 
@@ -45,6 +47,7 @@ public class GameEntity {
     // Add a reference to the ThemeEntity
     @ManyToOne
     @JoinColumn(name = "theme_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE) // Automatically delete games when a theme is deleted
     private ThemeEntity theme;
 
     // Add a playedAt field to track when the game was played
