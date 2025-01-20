@@ -30,7 +30,7 @@ public class ImgurService implements ImgurClient {
     @Override
     public String upload(byte[] imageBytes) {
         if (imageBytes == null || imageBytes.length == 0) {
-            throw new IllegalArgumentException("Image bytes cannot be null or empty.");
+            throw new ImgurUploadException("Image bytes cannot be null or empty.");
         }
 
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
@@ -64,10 +64,17 @@ public class ImgurService implements ImgurClient {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode rootNode = objectMapper.readTree(jsonResponse);
-            return rootNode.path("data").path("link").asText("");
+            JsonNode linkNode = rootNode.path("data").path("link");
+
+            if (linkNode.isMissingNode() || linkNode.asText().isEmpty()) {
+                throw new ImgurUploadException("Imgur response does not contain a valid image link.");
+            }
+
+            return linkNode.asText();
         } catch (Exception e) {
             logger.error("Failed to parse Imgur response JSON: {}", e.getMessage());
             throw new ImgurUploadException("Failed to parse Imgur response JSON.", e);
         }
     }
+
 }

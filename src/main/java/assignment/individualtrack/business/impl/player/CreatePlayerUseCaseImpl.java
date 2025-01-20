@@ -13,6 +13,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 
 import javax.crypto.SecretKey;
+import jakarta.validation.Valid;
 
 @Service
 @AllArgsConstructor
@@ -22,20 +23,7 @@ public class CreatePlayerUseCaseImpl implements CreatePlayerUseCase {
     private static final SecretKey SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
     @Override
-    public CreatePlayerResponse createPlayer(CreatePlayerRequest player) {
-        if (player == null) {
-            throw new IllegalArgumentException("Player request cannot be null");
-        }
-        if (player.getName() == null || player.getName().isEmpty()) {
-            throw new IllegalArgumentException("Player name cannot be null or empty");
-        }
-        if (player.getPassword() == null || player.getPassword().isEmpty()) {
-            throw new IllegalArgumentException("Password cannot be null or empty");
-        }
-        if (player.getPassword().length() < 6) {
-            throw new IllegalArgumentException("Password must be at least 6 characters");
-        }
-
+    public CreatePlayerResponse createPlayer(@Valid CreatePlayerRequest player) {
         if (playerRepo.existsByName(player.getName())) {
             return null;
         }
@@ -51,7 +39,7 @@ public class CreatePlayerUseCaseImpl implements CreatePlayerUseCase {
                 .name(request.getName())
                 .password(passwordEncoder.encode(request.getPassword())) // Encrypt the password
                 .role(Role.USER)
-                .highscore(0)  // Set highScore to 0 for new players
+                .highscore(0) // Set highScore to 0 for new players
                 .build();
 
         return playerRepo.save(newPlayer);

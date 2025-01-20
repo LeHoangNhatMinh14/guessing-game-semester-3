@@ -1,6 +1,7 @@
 package assignment.individualtrack.game;
 
 import assignment.individualtrack.business.impl.game.CreateGameUseCaseImpl;
+import assignment.individualtrack.business.impl.themes.PokemonService;
 import assignment.individualtrack.domain.Game.GameStatus;
 import assignment.individualtrack.domain.Game.StartGameRequest;
 import assignment.individualtrack.domain.Game.StartGameResponse;
@@ -33,6 +34,9 @@ class CreateGameUseCaseImplTest {
     @Mock
     private ThemeRepo themeRepo;
 
+    @Mock
+    private PokemonService pokemonService;
+
     @InjectMocks
     private CreateGameUseCaseImpl createGameUseCase;
 
@@ -43,9 +47,8 @@ class CreateGameUseCaseImplTest {
 
     @Test
     void createGame_happyPath_shouldCreateGameSuccessfully() {
-        // Arrange
         Long playerId = 1L;
-        Long themeId = 2L; // Valid theme ID
+        Long themeId = 2L;
         PlayerEntity playerEntity = new PlayerEntity();
         playerEntity.setId(playerId);
 
@@ -54,7 +57,7 @@ class CreateGameUseCaseImplTest {
 
         StartGameRequest request = StartGameRequest.builder()
                 .playerID(playerId)
-                .themeID(themeId) // Provide valid theme ID
+                .themeID(themeId)
                 .build();
 
         when(playerRepo.findById(playerId)).thenReturn(Optional.of(playerEntity));
@@ -65,7 +68,7 @@ class CreateGameUseCaseImplTest {
         GameEntity savedGameEntity = GameEntity.builder()
                 .id(10L)
                 .player(playerEntity)
-                .theme(themeEntity) // Associate theme entity
+                .theme(themeEntity)
                 .score(0)
                 .time(0)
                 .status(GameStatus.IN_PROGRESS)
@@ -73,10 +76,8 @@ class CreateGameUseCaseImplTest {
 
         when(gameRepo.save(any(GameEntity.class))).thenReturn(savedGameEntity);
 
-        // Act
         StartGameResponse response = createGameUseCase.createGame(request);
 
-        // Assert
         assertNotNull(response);
         assertEquals(10L, response.getGameId());
         assertEquals(playerId, response.getPlayerId());
@@ -87,46 +88,101 @@ class CreateGameUseCaseImplTest {
 
         GameEntity capturedGameEntity = gameEntityCaptor.getValue();
         assertEquals(playerEntity, capturedGameEntity.getPlayer());
-        assertEquals(themeEntity, capturedGameEntity.getTheme()); // Verify theme
+        assertEquals(themeEntity, capturedGameEntity.getTheme());
         assertEquals(0, capturedGameEntity.getScore());
         assertEquals(0, capturedGameEntity.getTime());
         assertEquals(GameStatus.IN_PROGRESS, capturedGameEntity.getStatus());
     }
 
     @Test
-    void createGame_nullPlayerId_shouldThrowException() {
-        // Arrange
+    void createGame_pokemonTheme_shouldUsePokemonService() {
+        Long playerId = 1L;
+        Long pokemonThemeId = 100L; // Predefined Pokemon theme ID
+        PlayerEntity playerEntity = new PlayerEntity();
+        playerEntity.setId(playerId);
+
+        ThemeEntity themeEntity = new ThemeEntity();
+        themeEntity.setId(pokemonThemeId);
+
         StartGameRequest request = StartGameRequest.builder()
-                .playerID(null)
+                .playerID(playerId)
+                .themeName("Pokemon")
                 .build();
 
-        // Act & Assert
+        when(playerRepo.findById(playerId)).thenReturn(Optional.of(playerEntity));
+        when(pokemonService.getPokemonThemeId()).thenReturn(pokemonThemeId);
+        when(themeRepo.findById(pokemonThemeId)).thenReturn(Optional.of(themeEntity));
+
+        ArgumentCaptor<GameEntity> gameEntityCaptor = ArgumentCaptor.forClass(GameEntity.class);
+
+        GameEntity savedGameEntity = GameEntity.builder()
+                .id(10L)
+                .player(playerEntity)
+                .theme(themeEntity)
+                .score(0)
+                .time(0)
+                .status(GameStatus.IN_PROGRESS)
+                .build();
+
+        when(gameRepo.save(any(GameEntity.class))).thenReturn(savedGameEntity);
+
+        StartGameResponse response = createGameUseCase.createGame(request);
+
+        assertNotNull(response);
+        assertEquals(10L, response.getGameId());
+        assertEquals(playerId, response.getPlayerId());
+
+        verify(playerRepo).findById(playerId);
+        verify(pokemonService).getPokemonThemeId();
+        verify(themeRepo).findById(pokemonThemeId);
+        verify(gameRepo).save(gameEntityCaptor.capture());
+    }
+
+    @Test
+    void createGame_themeNotFound_shouldThrowException() {
+        Long playerId = 1L;
+        Long themeId = 2L;
+        StartGameRequest request = StartGameRequest.builder()
+                .playerID(playerId)
+                .themeID(themeId)
+                .build();
+
+        when(playerRepo.findById(playerId)).thenReturn(Optional.of(new PlayerEntity()));
+        when(themeRepo.findById(themeId)).thenReturn(Optional.empty());
+
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> createGameUseCase.createGame(request));
-        assertEquals("Invalid or missing player ID.", exception.getMessage());
+        assertEquals("Theme not found with ID: " + themeId, exception.getMessage());
+
+        verify(playerRepo).findById(playerId);
+        verify(themeRepo).findById(themeId);
+        verifyNoInteractions(gameRepo);
+    }
+
+    @Test
+    void createGame_nullThemeId_shouldThrowException() {
+        Long playerId = 1L;
+        StartGameRequest request = StartGameRequest.builder()
+                .playerID(playerId)
+                .themeID(null)
+                .build();
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> createGameUseCase.createGame(request));
+        assertEquals("Invalid or missing theme ID.", exception.getMessage());
 
         verifyNoInteractions(playerRepo);
         verifyNoInteractions(gameRepo);
     }
 
     @Test
-    void createGame_playerNotFound_shouldThrowException() {
-        // Arrange
-        Long playerId = 1L;
-        Long themeId = 2L; // Valid theme ID
+    void createGame_invalidPlayerId_shouldThrowException() {
         StartGameRequest request = StartGameRequest.builder()
-                .playerID(playerId)
-                .themeID(themeId)
+                .playerID(-1L)
                 .build();
 
-        when(playerRepo.findById(playerId)).thenReturn(Optional.empty());
-        when(themeRepo.findById(themeId)).thenReturn(Optional.of(new ThemeEntity())); // Mock valid theme
-
-        // Act & Assert
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> createGameUseCase.createGame(request));
-        assertEquals("Player not found with ID: " + playerId, exception.getMessage());
+        assertEquals("Invalid or missing player ID.", exception.getMessage());
 
-        verify(playerRepo).findById(playerId);
+        verifyNoInteractions(playerRepo);
         verifyNoInteractions(gameRepo);
     }
-
 }

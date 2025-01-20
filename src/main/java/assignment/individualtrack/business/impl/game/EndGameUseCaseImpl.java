@@ -26,11 +26,18 @@ public class EndGameUseCaseImpl implements EndGameUseCase {
             throw new IllegalStateException("Game is already completed.");
         }
 
+        // Calculate score based on correct and incorrect guesses
+        int calculatedScore = request.getCorrectGuesses() - request.getIncorrectGuesses();
+
+        if (calculatedScore < 0) {
+            calculatedScore = 0;
+        }
+
         // Update game entity with new data
         gameEntity.setCorrectGuesses(request.getCorrectGuesses());
         gameEntity.setWrongGuesses(request.getIncorrectGuesses());
         gameEntity.setTime(request.getTime());
-        gameEntity.setScore(request.getCorrectGuesses() - request.getIncorrectGuesses()); // Update score
+        gameEntity.setScore(calculatedScore); // Use calculated score
         gameEntity.setStatus(request.getStatus());
 
         // Save updated game entity
@@ -46,4 +53,3 @@ public class EndGameUseCaseImpl implements EndGameUseCase {
                 .build();
     }
 }
-

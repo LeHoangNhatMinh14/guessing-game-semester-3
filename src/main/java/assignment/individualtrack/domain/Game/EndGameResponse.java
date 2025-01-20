@@ -11,5 +11,4 @@ public class EndGameResponse {
     private int correctGuesses;
     private int incorrectGuesses;
     private String message;
-
 }
